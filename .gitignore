@@ -49,3 +49,7 @@ output/*/index.html
 
 # Sphinx
 docs/_build
+
+# Python
+.venv
+venv
