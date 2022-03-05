@@ -47,17 +47,17 @@ How to send different types of HTTP requests
 :param data: send data in the body of the request
 ```python
 # Send HTTP 'GET' request
-client.counters().get(data: dict = None, params: dict = None)
+await client.counters().get(data: dict = None, params: dict = None)
 # Send HTTP 'POST' request
-client.counters().post(data: dict = None, params: dict = None)
+await client.counters().post(data: dict = None, params: dict = None)
 # Send HTTP 'DELETE' request
-client.counters().delete(data: dict = None, params: dict = None)
+await client.counters().delete(data: dict = None, params: dict = None)
 # Send HTTP 'PUT' request
-client.counters().put(data: dict = None, params: dict = None)
+await client.counters().put(data: dict = None, params: dict = None)
 # Send HTTP 'PATCH' request
-client.counters().patch(data: dict = None, params: dict = None)
+await client.counters().patch(data: dict = None, params: dict = None)
 # Send HTTP 'OPTIONS' request
-client.counters().options(data: dict = None, params: dict = None)
+await client.counters().options(data: dict = None, params: dict = None)
 ```
 
 ```python
@@ -66,11 +66,11 @@ from tapi_yandex_metrika import YandexMetrikaManagement
 client = YandexMetrikaManagement(...)
 
 # Get counters. Via HTTP GET method.
-counters = client.counters().get()
+counters = await client.counters().get()
 print(counters.data)
 
 # Get counters sorted by visit. Via HTTP GET method.
-counters = client.counters().get(params={"sort": "Visits"})
+counters = await client.counters().get(params={"sort": "Visits"})
 print(counters.data)
 
 # Create a goal. Via HTTP POST method.
@@ -82,7 +82,7 @@ body = {
             "depth": 2
         }
     }
-client.goals().post(data=body)
+await client.goals().post(data=body)
 
 # Create target on JavaScript event. Via HTTP POST method.
 body2 = {
@@ -98,12 +98,12 @@ body2 = {
             ]
         }
     }
-client.goals().post(data=body2)
+await client.goals().post(data=body2)
 
 # For some resources, you need to substitute the object identifier in the url.
 # This is done by adding an identifier to the method itself.
 # Get information about the target. Via HTTP GET method.
-client.goal(goalId=10000).get()
+await client.goal(goalId=10000).get()
 
 # Change target. Via HTTP PUT method.
 body = {
@@ -115,15 +115,15 @@ body = {
         ...
     }
 }
-client.goal(goalId=10000).put(data=body)
+await client.goal(goalId=10000).put(data=body)
 
 # Delete target. Via HTTP DELETE method.
-client.goal(goalId=10000).delete()
+await client.goal(goalId=10000).delete()
 ```
 
 You can get information about the request.
 ```python
-counters = client.counters().get()
+counters = await client.counters().get()
 print(counters.response)
 print(counters.response.headers)
 print(counters.status_code)
