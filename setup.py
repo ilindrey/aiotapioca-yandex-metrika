@@ -32,7 +32,7 @@ setup(
     long_description_content_type="text/markdown",
     author="Pavel Maksimov",
     author_email="vur21@ya.ru",
-    url="git@github.com:ilindrey/tapi-yandex-metrika.git",
+    url="https://github.com/ilindrey/async-tapi-yandex-metrika",
     packages=[package],
     include_package_data=False,
     install_requires=["aiohttp", "async-tapi-wrapper==0.1.2"],
