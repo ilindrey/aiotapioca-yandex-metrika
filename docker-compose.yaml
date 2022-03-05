@@ -1,0 +1,9 @@
+version: "3"
+
+services:
+  async_tapi_yandex_metrika:
+    build:
+      context: .
+    volumes:
+      - ./:/app/
+    tty: true
