@@ -4,11 +4,10 @@ import random
 import re
 import time
 
-import orjson
-from tapi2 import TapiAdapter, generate_wrapper_from_adapter, JSONAdapterMixin
-from tapi2.exceptions import ResponseProcessException
+from async_tapi import TapiAdapter, generate_wrapper_from_adapter, JSONAdapterMixin
+from async_tapi.exceptions import ResponseProcessException
 
-from tapi_yandex_metrika import exceptions
+from . import exceptions
 from .resource_mapping import (
     STATS_RESOURCE_MAPPING,
     LOGSAPI_RESOURCE_MAPPING,
@@ -34,28 +33,20 @@ class YandexMetrikaClientAdapterAbstract(JSONAdapterMixin, TapiAdapter):
         )
         return params
 
-    def get_error_message(self, data, response=None):
+    async def get_error_message(self, data, response=None):
         if data is None:
-            return {"error_text": response.content.decode()}
+            return {"error_text": await response.text()}
         else:
             return data
 
     def format_data_to_request(self, data):
-        if data:
-            return orjson.dumps(data)
+        return data
 
-    def process_response(self, response, request_kwargs, **kwargs):
-        data = super().process_response(response, request_kwargs, **kwargs)
+    async def process_response(self, response, request_kwargs, **kwargs):
+        data = await super().process_response(response, request_kwargs, **kwargs)
         if isinstance(data, dict) and "errors" in data:
             raise ResponseProcessException(response, data)
         return data
-
-    def response_to_native(self, response):
-        if response.content.strip():
-            try:
-                return orjson.loads(response.content.decode())
-            except ValueError:
-                return response.text
 
     def retry_request(
         self,
@@ -72,18 +63,12 @@ class YandexMetrikaClientAdapterAbstract(JSONAdapterMixin, TapiAdapter):
         errors_types = [i.get("error_type") for i in error_message.get("errors", [])]
 
         limit_errors = {
-            "quota_requests_by_uid":
-                "The limit on the number of API requests per day for the user has been exceeded.",
-            "quota_delegate_requests":
-                "Exceeded the limit on the number of API requests to add representatives per hour for a user.",
-            "quota_grants_requests":
-                "Exceeded the limit on the number of API requests to add access to the counter per hour",
-            "quota_requests_by_ip":
-                "The limit on the number of API requests per second for an IP address has been exceeded.",
-            "quota_parallel_requests":
-                "The limit on the number of parallel API requests per day for the user has been exceeded.",
-            "quota_requests_by_counter_id":
-                "The limit on the number of API requests per day for the counter has been exceeded.",
+            "quota_requests_by_uid": "The limit on the number of API requests per day for the user has been exceeded.",
+            "quota_delegate_requests": "Exceeded the limit on the number of API requests to add representatives per hour for a user.",
+            "quota_grants_requests": "Exceeded the limit on the number of API requests to add access to the counter per hour",
+            "quota_requests_by_ip": "The limit on the number of API requests per second for an IP address has been exceeded.",
+            "quota_parallel_requests": "The limit on the number of parallel API requests per day for the user has been exceeded.",
+            "quota_requests_by_counter_id": "The limit on the number of API requests per day for the counter has been exceeded.",
         }
         big_report_request = (
             "Query is too complicated. Please reduce the date interval or sampling."
@@ -156,8 +141,8 @@ class YandexMetrikaManagementClientAdapter(YandexMetrikaClientAdapterAbstract):
 class YandexMetrikaLogsapiClientAdapter(YandexMetrikaClientAdapterAbstract):
     resource_mapping = LOGSAPI_RESOURCE_MAPPING
 
-    def process_response(self, response, request_kwargs, **kwargs):
-        data = super().process_response(response, request_kwargs, **kwargs)
+    async def process_response(self, response, request_kwargs, **kwargs):
+        data = await super().process_response(response, request_kwargs, **kwargs)
         if "download" in request_kwargs["url"]:
             kwargs["store"]["columns"] = data[: data.find("\n")].split("\t")
         else:
@@ -288,25 +273,27 @@ class YandexMetrikaLogsapiClientAdapter(YandexMetrikaClientAdapterAbstract):
     def get_iterator_items(self, data, **kwargs):
         return self._iter_line(data, **kwargs)
 
-    def parts(self, max_parts=None, **kwargs):
+    async def parts(self, max_parts=None, **kwargs):
         client = kwargs["client"]
-        yield from client.pages(max_pages=max_parts)
+        async for part in client.pages(max_pages=max_parts):
+            yield part
 
-    def iter_lines(self, max_parts=None, max_rows=None, **kwargs):
+    async def iter_lines(self, max_parts=None, max_rows=None, **kwargs):
         max_rows = max_rows or kwargs.get("max_items")
         client = kwargs["client"]
-        yield from client.iter_items(max_pages=max_parts, max_items=max_rows)
+        async for item in client.iter_items(max_pages=max_parts, max_items=max_rows):
+            yield item
 
-    def iter_values(self, max_parts=None, max_rows=None, **kwargs):
+    async def iter_values(self, max_parts=None, max_rows=None, **kwargs):
         max_rows = max_rows or kwargs.get("max_items")
         client = kwargs["client"]
-        for line in client.iter_items(max_pages=max_parts, max_items=max_rows):
+        async for line in client.iter_items(max_pages=max_parts, max_items=max_rows):
             yield line.split("\t")
 
-    def iter_dicts(self, max_parts=None, max_rows=None, **kwargs):
+    async def iter_dicts(self, max_parts=None, max_rows=None, **kwargs):
         max_rows = max_rows or kwargs.get("max_items")
         client = kwargs["client"]
-        for values in client.iter_values(max_pages=max_parts, max_items=max_rows):
+        async for values in client.iter_values(max_pages=max_parts, max_items=max_rows):
             yield dict(zip(kwargs["store"]["columns"], values))
 
     def lines(self, max_rows=None, **kwargs):
@@ -352,8 +339,8 @@ class YandexMetrikaLogsapiClientAdapter(YandexMetrikaClientAdapterAbstract):
 class YandexMetrikaStatsClientAdapter(YandexMetrikaClientAdapterAbstract):
     resource_mapping = STATS_RESOURCE_MAPPING
 
-    def process_response(self, response, request_kwargs, **kwargs):
-        data = super().process_response(response, request_kwargs, **kwargs)
+    async def process_response(self, response, request_kwargs, **kwargs):
+        data = await super().process_response(response, request_kwargs, **kwargs)
         attribution = data["query"]["attribution"]
         sampled = data["sampled"]
         sample_share = data["sample_share"]
@@ -423,19 +410,23 @@ class YandexMetrikaStatsClientAdapter(YandexMetrikaClientAdapterAbstract):
     def get_iterator_items(self, data, **kwargs):
         return self._iter_transform_data(data)
 
-    def iter_rows(self, max_pages=None, max_rows=None, **kwargs):
+    async def iter_rows(self, max_pages=None, max_rows=None, **kwargs):
         max_rows = max_rows or kwargs.get("max_items")
         client = kwargs["client"]
-        yield from client.iter_items(max_pages=max_pages, max_items=max_rows)
+        async for item in client.iter_items(max_pages=max_pages, max_items=max_rows):
+            yield item
 
-    def iter_values(self, max_pages=None, max_rows=None, **kwargs):
-        return self.iter_rows(max_pages=max_pages, max_rows=max_rows, **kwargs)
+    async def iter_values(self, max_pages=None, max_rows=None, **kwargs):
+        max_rows = max_rows or kwargs.get("max_items")
+        client = kwargs["client"]
+        async for item in client.iter_items(max_pages=max_pages, max_items=max_rows):
+            yield item
 
-    def iter_dicts(self, max_pages=None, max_rows=None, **kwargs):
-        for values in self.iter_values(
-            max_pages=max_pages, max_rows=max_rows, **kwargs
-        ):
-            yield dict(zip(kwargs["store"]["columns"], values))
+    async def iter_dicts(self, max_pages=None, max_rows=None, **kwargs):
+        max_rows = max_rows or kwargs.get("max_items")
+        client = kwargs["client"]
+        async for item in client.iter_items(max_pages=max_pages, max_items=max_rows):
+            yield dict(zip(kwargs["store"]["columns"], item))
 
     def rows(self, max_rows=None, **kwargs):
         max_rows = max_rows or kwargs.get("max_items")

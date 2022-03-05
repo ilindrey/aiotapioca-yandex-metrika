@@ -2,7 +2,6 @@ from typing import Union, List, Iterator
 
 from requests import Response
 
-
 class YandexMetrikaBaseMethods:
     @property
     def data(self) -> dict: ...
