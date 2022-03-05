@@ -21,42 +21,42 @@ params = {
 }
 
 # Check the possibility of creating a report. Via HTTP GET method.
-result = client.evaluate().get(params=params)
+result = await client.evaluate().get(params=params)
 print(result)
 
 
 # Order a report. Via HTTP POST method.
-result = client.create().post(params=params)
+result = await client.create().post(params=params)
 request_id = result["log_request"]["request_id"]
 print(result)
 
 
 # Cancel report creation. Via HTTP POST method.
-result = client.cancel(requestId=request_id).post()
+result = await client.cancel(requestId=request_id).post()
 print(result)
 
 
 # Delete report. Via HTTP POST method.
-result = client.clean(requestId=request_id).post()
+result = await client.clean(requestId=request_id).post()
 print(result)
 
 
 # Get information about all reports stored on the server. Via HTTP GET method.
-result = client.allinfo().get()
+result = await client.allinfo().get()
 print(result)
 
 
 # Get information about a specific report. Via HTTP GET method.
-result = client.info(requestId=request_id).get()
+result = await client.info(requestId=request_id).get()
 print(result)
 
 
 # Download the report. Via HTTP POST method.
-result = client.create().post(params=params)
+result = await client.create().post(params=params)
 request_id = result["log_request"]["request_id"]
 
 # The report can be downloaded when it is generated on the server. Via HTTP GET method.
-info = client.info(requestId=request_id).get()
+info = await client.info(requestId=request_id).get()
 if info["log_request"]["status"] == "processed":
 
     # The report can consist of several parts.
@@ -65,7 +65,7 @@ if info["log_request"]["status"] == "processed":
 
     # The partNumber parameter specifies the number of the part of the report that you want to download.
     # Default partNumber=0
-    part = client.download(requestId=request_id, partNumber=0).get()
+    part = await client.download(requestId=request_id, partNumber=0).get()
 
     print("Raw data")
     data = part.data[:1000]
@@ -107,10 +107,10 @@ params={
     "date1": "2019-01-01",
     "date2": "2019-01-01"
 }
-info = client.create().post(params=params)
+info = await client.create().post(params=params)
 request_id = info["log_request"]["request_id"]
 
-report = client.download(requestId=request_id).get()
+report = await client.download(requestId=request_id).get()
 
 print("Raw data")
 data = report.data
@@ -133,21 +133,21 @@ print(report().to_dicts())
 from tapi_yandex_metrika import YandexMetrikaLogsapi
 
 client = YandexMetrikaLogsapi(...)
-info = client.create().post(params=...)
+info = await client.create().post(params=...)
 request_id = info["log_request"]["request_id"]
-report = client.download(requestId=request_id).get()
+report = await client.download(requestId=request_id).get()
 
 print(report.columns)
 
 # Iteration parts.
-for part in report().parts():
+async for part in report().parts():
     print(part.data)  # raw data
     print(part().to_values())
     print(part().to_lines())
     print(part().to_columns())  # columns data orient
     print(part().to_dicts())
 
-for part in report().parts():
+async for part in report().parts():
     # Iteration lines.
     for row_as_text in part().lines():
         print(row_as_text)
@@ -172,19 +172,19 @@ Will iterate over all lines of all parts
 from tapi_yandex_metrika import YandexMetrikaLogsapi
 
 client = YandexMetrikaLogsapi(...)
-info = client.create().post(params=...)
+info = await client.create().post(params=...)
 request_id = info["log_request"]["request_id"]
-report = client.download(requestId=request_id).get()
+report = await client.download(requestId=request_id).get()
 
 print(report.columns)
 
-for row_as_line in report().iter_lines():
+async for row_as_line in report().iter_lines():
     print(row_as_line)
 
-for row_as_values in report().iter_values():
+async for row_as_values in report().iter_values():
     print(row_as_values)
 
-for row_as_dict in report().iter_dicts():
+async for row_as_dict in report().iter_dicts():
     print(row_as_dict)
 ```
 
@@ -203,7 +203,7 @@ for row_as_dict in report().iter_dicts():
 from tapi_yandex_metrika import YandexMetrikaLogsapi
 
 client = YandexMetrikaLogsapi(...)
-info = client.create().post(params=...)
+info = await client.create().post(params=...)
 
 print(info.data)
 print(info.response)
@@ -211,7 +211,7 @@ print(info.response.headers)
 print(info.status_code)
 
 report = client.download(requestId=info["log_request"]["request_id"]).get()
-for part in report().parts():
+async for part in report().parts():
     print(part.data)
     print(part.response)
     print(part.response.headers)
@@ -223,11 +223,11 @@ Pay attention to which HTTP method you send the request.
 Some resources work only with POST or only with GET requests.
 For example create resource with POST method only
 
-    client.create().post(params=params)
+    await client.create().post(params=params)
 
 And evaluate method only with GET method
 
-    client.evaluate().get(params=params)
+    await client.evaluate().get(params=params)
 
 
 ## AUTHORS
@@ -243,6 +243,9 @@ Copyright (c) Pavel Maksimov.
 
 
 ## CHANGELOG
+### Release 2022.1.5
+- asynchrony added
+
 ### Release 2021.5.28
 - Add stub file (syntax highlighting)
 

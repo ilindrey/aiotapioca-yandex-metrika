@@ -21,7 +21,7 @@ params = dict(
     lang="en",
     # Other params -> https://yandex.ru/dev/metrika/doc/api2/api_v1/data.html
 )
-report = client.stats().get(params=params)
+report = await client.stats().get(params=params)
 
 # Raw data
 print(report.data)
@@ -54,10 +54,10 @@ report().to_columns()
 from tapi_yandex_metrika import YandexMetrikaStats
 
 client = YandexMetrikaStats(access_token=...)
-report = client.stats().get(params=...)
+report = await client.stats().get(params=...)
 
 print("iteration report pages")
-for page in report().pages():
+async for page in report().pages():
     # Raw data.
     print(page.data)
 
@@ -66,7 +66,7 @@ for page in report().pages():
     print(page().to_values())
 
 print("iteration report pages")
-for page in report().pages():
+async for page in report().pages():
     print("iteration rows as values")
     for row_as_values_of_page in page().values():
         print(row_as_values_of_page)
@@ -90,9 +90,9 @@ Will iterate over all lines of all pages
 from tapi_yandex_metrika import YandexMetrikaStats
 
 client = YandexMetrikaStats(access_token=...)
-report = client.stats().get(params=...)
+report = await client.stats().get(params=...)
 
-for values in report().iter_values():
+async for values in report().iter_values():
     print(values)
 # ['2020-10-01', 14234.0]
 # ['2020-10-02', 12508.0]
@@ -101,7 +101,7 @@ for values in report().iter_values():
 # ['2020-10-05', 14579.0]
 # ['2020-10-06', 12795.0]
 
-for row_as_dict in report().iter_dicts():
+async for row_as_dict in report().iter_dicts():
     print(row_as_dict)
 ```
 
@@ -117,10 +117,10 @@ for row_as_dict in report().iter_dicts():
 from tapi_yandex_metrika import YandexMetrikaStats
 
 client = YandexMetrikaStats(access_token=...)
-report = client.stats().get(params=...)
+report = await client.stats().get(params=...)
 
 print("iteration report rows with limit")
-for page in report().pages(max_pages=2):
+async for page in report().pages(max_pages=2):
     for values in page().values(max_rows=2):
         print(values)
 # ['2020-10-01', 14234.0]
@@ -129,7 +129,7 @@ for page in report().pages(max_pages=2):
 
 
 print("Will iterate over all lines of all pages with limit")
-for values in report().iter_values(max_pages=2, max_rows=1):
+async for values in report().iter_values(max_pages=2, max_rows=1):
     print(values)
 # ['2020-10-01', 14234.0]
 ```
@@ -139,13 +139,13 @@ for values in report().iter_values(max_pages=2, max_rows=1):
 from tapi_yandex_metrika import YandexMetrikaStats
 
 client = YandexMetrikaStats(access_token=...)
-report = client.stats().get(params=...)
+report = await client.stats().get(params=...)
 
 print(report.response)
 print(report.response.status_code)
 print(report.response.headers)
 
-for page in report().pages():
+async for page in report().pages():
     print(page.response)
     print(page.response.status_code)
     print(page.response.headers)
