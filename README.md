@@ -5,15 +5,11 @@
 [![Downloads](https://pepy.tech/badge/tapi-yandex-metrika)](https://pepy.tech/project/tapi-yandex-metrika)
 <a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
 
+It's an async fork of [tapi-yandex-metrica](https://github.com/pavelmaksimov/tapi-yandex-metrika) library.
+
 ## Installation
 
-Prev version
-
-    pip install --upgrade tapi-yandex-metrika==2020.10.20
-
-Last version. Has backward incompatible changes.
-
-    pip install --upgrade tapi-yandex-metrika==2021.5.28
+    pip install async-tapi-yandex-metrika
 
 ## Documentation
 
