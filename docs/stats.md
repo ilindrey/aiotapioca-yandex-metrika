@@ -9,43 +9,43 @@ from tapi_yandex_metrika import YandexMetrikaStats
 ACCESS_TOKEN = ""
 COUNTER_ID = ""
 
-client = YandexMetrikaStats(access_token=ACCESS_TOKEN)
+async with YandexMetrikaStats(access_token=ACCESS_TOKEN) as client:
 
-params = dict(
-    ids=COUNTER_ID,
-    date1="2020-10-01",
-    date2=dt.date(2020,10,5),
-    metrics="ym:s:visits",
-    dimensions="ym:s:date",
-    sort="ym:s:date",
-    lang="en",
-    # Other params -> https://yandex.com/dev/metrika/doc/api2/api_v1/data.html
-)
-report = await client.stats().get(params=params)
+    params = dict(
+        ids=COUNTER_ID,
+        date1="2020-10-01",
+        date2=dt.date(2020,10,5),
+        metrics="ym:s:visits",
+        dimensions="ym:s:date",
+        sort="ym:s:date",
+        lang="en",
+        # Other params -> https://yandex.com/dev/metrika/doc/api2/api_v1/data.html
+    )
+    report = await client.stats().get(params=params)
 
-# Raw data
-print(report.data)
+    # Raw data
+    print(report.data)
 
-print(report.columns)
-# ['ym:s:date', 'ym:s:visits']
+    print(report.columns)
+    # ['ym:s:date', 'ym:s:visits']
 
-report().to_values()
-#[
-#    ['2020-10-01', 14234.0],
-#    ['2020-10-02', 12508.0],
-#    ['2020-10-03', 12365.0],
-#    ['2020-10-04', 14588.0],
-#    ['2020-10-05', 14579.0]
-#]
+    report().to_values()
+    #[
+    #    ['2020-10-01', 14234.0],
+    #    ['2020-10-02', 12508.0],
+    #    ['2020-10-03', 12365.0],
+    #    ['2020-10-04', 14588.0],
+    #    ['2020-10-05', 14579.0]
+    #]
 
-report().to_dicts()
+    report().to_dicts()
 
-# Column data orient
-report().to_columns()
-#[
-#    ['2020-10-01', '2020-10-02', '2020-10-03', '2020-10-04', '2020-10-05'],
-#    [14234.0, 12508.0, 12365.0, 14588.0, 14579.0]
-#]
+    # Column data orient
+    report().to_columns()
+    #[
+    #    ['2020-10-01', '2020-10-02', '2020-10-03', '2020-10-04', '2020-10-05'],
+    #    [14234.0, 12508.0, 12365.0, 14588.0, 14579.0]
+    #]
 
 ```
 
@@ -53,33 +53,33 @@ report().to_columns()
 ```python
 from tapi_yandex_metrika import YandexMetrikaStats
 
-client = YandexMetrikaStats(access_token=...)
-report = await client.stats().get(params=...)
+async with YandexMetrikaStats(access_token=...) as client:
+    report = await client.stats().get(params=...)
 
-print("iteration report pages")
-async for page in report().pages():
-    # Raw data.
-    print(page.data)
+    print("iteration report pages")
+    async for page in report().pages():
+        # Raw data.
+        print(page.data)
 
-    print(page().to_dicts())
-    print(page().to_columns())
-    print(page().to_values())
+        print(page().to_dicts())
+        print(page().to_columns())
+        print(page().to_values())
 
-print("iteration report pages")
-async for page in report().pages():
-    print("iteration rows as values")
-    for row_as_values_of_page in page().values():
-        print(row_as_values_of_page)
-    # ['2020-10-01', 14234.0]
-    # ['2020-10-02', 12508.0]
-    # ['2020-10-03', 12365.0]
-    # ['2020-10-04', 14588.0]
-    # ['2020-10-05', 14579.0]
-    # ['2020-10-06', 12795.0]
+    print("iteration report pages")
+    async for page in report().pages():
+        print("iteration rows as values")
+        for row_as_values_of_page in page().values():
+            print(row_as_values_of_page)
+        # ['2020-10-01', 14234.0]
+        # ['2020-10-02', 12508.0]
+        # ['2020-10-03', 12365.0]
+        # ['2020-10-04', 14588.0]
+        # ['2020-10-05', 14579.0]
+        # ['2020-10-06', 12795.0]
 
-    print("iteration rows as dict")
-    for row_as_dict_of_page in page().dicts():
-        print(row_as_dict_of_page)
+        print("iteration rows as dict")
+        for row_as_dict_of_page in page().dicts():
+            print(row_as_dict_of_page)
 ```
 
 ## Iterate all rows of all parts of the report
@@ -89,20 +89,20 @@ Will iterate over all lines of all pages
 ```python
 from tapi_yandex_metrika import YandexMetrikaStats
 
-client = YandexMetrikaStats(access_token=...)
-report = await client.stats().get(params=...)
+async with YandexMetrikaStats(access_token=...) as client:
+    report = await client.stats().get(params=...)
 
-async for values in report().iter_values():
-    print(values)
-# ['2020-10-01', 14234.0]
-# ['2020-10-02', 12508.0]
-# ['2020-10-03', 12365.0]
-# ['2020-10-04', 14588.0]
-# ['2020-10-05', 14579.0]
-# ['2020-10-06', 12795.0]
+    async for values in report().iter_values():
+        print(values)
+    # ['2020-10-01', 14234.0]
+    # ['2020-10-02', 12508.0]
+    # ['2020-10-03', 12365.0]
+    # ['2020-10-04', 14588.0]
+    # ['2020-10-05', 14579.0]
+    # ['2020-10-06', 12795.0]
 
-async for row_as_dict in report().iter_dicts():
-    print(row_as_dict)
+    async for row_as_dict in report().iter_dicts():
+        print(row_as_dict)
 ```
 
 ## Iteration limit.
@@ -116,39 +116,41 @@ async for row_as_dict in report().iter_dicts():
 ```python
 from tapi_yandex_metrika import YandexMetrikaStats
 
-client = YandexMetrikaStats(access_token=...)
-report = await client.stats().get(params=...)
+async with YandexMetrikaStats(access_token=...) as client:
 
-print("iteration report rows with limit")
-async for page in report().pages(max_pages=2):
-    for values in page().values(max_rows=2):
+    report = await client.stats().get(params=...)
+
+    print("iteration report rows with limit")
+    async for page in report().pages(max_pages=2):
+        for values in page().values(max_rows=2):
+            print(values)
+    # ['2020-10-01', 14234.0]
+    # ['2020-10-02', 12508.0]
+    # ['2020-10-06', 12795.0]
+
+
+    print("Will iterate over all lines of all pages with limit")
+    async for values in report().iter_values(max_pages=2, max_rows=1):
         print(values)
-# ['2020-10-01', 14234.0]
-# ['2020-10-02', 12508.0]
-# ['2020-10-06', 12795.0]
-
-
-print("Will iterate over all lines of all pages with limit")
-async for values in report().iter_values(max_pages=2, max_rows=1):
-    print(values)
-# ['2020-10-01', 14234.0]
+    # ['2020-10-01', 14234.0]
 ```
 
 ## Response
 ```python
 from tapi_yandex_metrika import YandexMetrikaStats
 
-client = YandexMetrikaStats(access_token=...)
-report = await client.stats().get(params=...)
+async with YandexMetrikaStats(access_token=...) as client:
 
-print(report.response)
-print(report.response.status_code)
-print(report.response.headers)
+    report = await client.stats().get(params=...)
 
-async for page in report().pages():
-    print(page.response)
-    print(page.response.status_code)
-    print(page.response.headers)
+    print(report.response)
+    print(report.response.status)
+    print(report.response.headers)
+
+    async for page in report().pages():
+        print(page.response)
+        print(page.response.status)
+        print(page.response.headers)
 ```
 
 

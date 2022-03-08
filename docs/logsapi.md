@@ -8,11 +8,6 @@ from tapi_yandex_metrika import YandexMetrikaLogsapi
 ACCESS_TOKEN = ""
 COUNTER_ID = ""
 
-client = YandexMetrikaLogsapi(
-    access_token=ACCESS_TOKEN,
-    default_url_params={'counterId': COUNTER_ID}
-)
-
 params = {
     "fields": "ym:s:date,ym:s:clientID",
     "source": "visits",
@@ -20,69 +15,74 @@ params = {
     "date2": "2021-01-01"
 }
 
-# Check the possibility of creating a report. Via HTTP GET method.
-result = await client.evaluate().get(params=params)
-print(result)
+async with YandexMetrikaLogsapi(
+    access_token=ACCESS_TOKEN,
+    default_url_params={'counterId': COUNTER_ID}
+) as client:
+
+    # Check the possibility of creating a report. Via HTTP GET method.
+    result = await client.evaluate().get(params=params)
+    print(result)
 
 
-# Order a report. Via HTTP POST method.
-result = await client.create().post(params=params)
-request_id = result["log_request"]["request_id"]
-print(result)
+    # Order a report. Via HTTP POST method.
+    result = await client.create().post(params=params)
+    request_id = result["log_request"]["request_id"]
+    print(result)
 
 
-# Cancel report creation. Via HTTP POST method.
-result = await client.cancel(requestId=request_id).post()
-print(result)
+    # Cancel report creation. Via HTTP POST method.
+    result = await client.cancel(requestId=request_id).post()
+    print(result)
 
 
-# Delete report. Via HTTP POST method.
-result = await client.clean(requestId=request_id).post()
-print(result)
+    # Delete report. Via HTTP POST method.
+    result = await client.clean(requestId=request_id).post()
+    print(result)
 
 
-# Get information about all reports stored on the server. Via HTTP GET method.
-result = await client.allinfo().get()
-print(result)
+    # Get information about all reports stored on the server. Via HTTP GET method.
+    result = await client.allinfo().get()
+    print(result)
 
 
-# Get information about a specific report. Via HTTP GET method.
-result = await client.info(requestId=request_id).get()
-print(result)
+    # Get information about a specific report. Via HTTP GET method.
+    result = await client.info(requestId=request_id).get()
+    print(result)
 
 
-# Download the report. Via HTTP POST method.
-result = await client.create().post(params=params)
-request_id = result["log_request"]["request_id"]
+    # Download the report. Via HTTP POST method.
+    result = await client.create().post(params=params)
+    request_id = result["log_request"]["request_id"]
 
-# The report can be downloaded when it is generated on the server. Via HTTP GET method.
-info = await client.info(requestId=request_id).get()
-if info["log_request"]["status"] == "processed":
+    # The report can be downloaded when it is generated on the server. Via HTTP GET method.
+    info = await client.info(requestId=request_id).get()
+    if info["log_request"]["status"] == "processed":
 
-    # The report can consist of several parts.
-    parts = info["log_request"]["parts"]
-    print("Number of parts in the report", parts)
+        # The report can consist of several parts.
+        parts = info["log_request"]["parts"]
+        print("Number of parts in the report", parts)
 
-    # The partNumber parameter specifies the number of the part of the report that you want to download.
-    # Default partNumber=0
-    part = await client.download(requestId=request_id, partNumber=0).get()
+        # The partNumber parameter specifies the number of the part of the report that you want to download.
+        # Default partNumber=0
+        part = await client.download(requestId=request_id, partNumber=0).get()
 
-    print("Raw data")
-    data = part.data[:1000]
+        print("Raw data")
+        data = part.data[:1000]
 
-    print("Column names")
-    print(part.columns)
+        print("Column names")
+        print(part.columns)
 
-    # Transform to values
-    print(part().to_values()[:3])
+        # Transform to values
+        print(part().to_values()[:3])
 
-    # Transform to lines
-    print(part().to_lines()[:3])
+        # Transform to lines
+        print(part().to_lines()[:3])
 
-    # Transform to dicts
-    print(part().to_dicts()[:3])
-else:
-    print("Report not ready yet")
+        # Transform to dicts
+        print(part().to_dicts()[:3])
+    else:
+        print("Report not ready yet")
 ```
 
 ## Automatically download the report when it is prepared
@@ -95,70 +95,71 @@ from tapi_yandex_metrika import YandexMetrikaLogsapi
 ACCESS_TOKEN = ""
 COUNTER_ID = ""
 
-client = YandexMetrikaLogsapi(
-    access_token=ACCESS_TOKEN,
-    default_url_params={'counterId': COUNTER_ID},
-    # Download the report when it will be created
-    wait_report=True,
-)
 params={
     "fields": "ym:s:date,ym:s:clientID,ym:s:dateTime,ym:s:startURL,ym:s:endURL",
     "source": "visits",
     "date1": "2019-01-01",
     "date2": "2019-01-01"
 }
-info = await client.create().post(params=params)
-request_id = info["log_request"]["request_id"]
+async with YandexMetrikaLogsapi(
+    access_token=ACCESS_TOKEN,
+    default_url_params={'counterId': COUNTER_ID},
+    # Download the report when it will be created
+    wait_report=True,
+) as client:
+    info = await client.create().post(params=params)
+    request_id = info["log_request"]["request_id"]
 
-report = await client.download(requestId=request_id).get()
+    report = await client.download(requestId=request_id).get()
 
-print("Raw data")
-data = report.data
+    print("Raw data")
+    data = report.data
 
-print("Column names")
-print(report.columns)
+    print("Column names")
+    print(report.columns)
 
-# Transform to values
-print(report().to_values())
+    # Transform to values
+    print(report().to_values())
 
-# Transform to lines
-print(report().to_lines())
+    # Transform to lines
+    print(report().to_lines())
 
-# Transform to dict
-print(report().to_dicts())
+    # Transform to dict
+    print(report().to_dicts())
 ```
 
 ## Export of all report parts.
 ```python
 from tapi_yandex_metrika import YandexMetrikaLogsapi
 
-client = YandexMetrikaLogsapi(...)
-info = await client.create().post(params=...)
-request_id = info["log_request"]["request_id"]
-report = await client.download(requestId=request_id).get()
+async with YandexMetrikaLogsapi(...) as client:
 
-print(report.columns)
+    info = await client.create().post(params=...)
+    request_id = info["log_request"]["request_id"]
+    report = await client.download(requestId=request_id).get()
 
-# Iteration parts.
-async for part in report().parts():
-    print(part.data)  # raw data
-    print(part().to_values())
-    print(part().to_lines())
-    print(part().to_columns())  # columns data orient
-    print(part().to_dicts())
+    print(report.columns)
 
-async for part in report().parts():
-    # Iteration lines.
-    for row_as_text in part().lines():
-        print(row_as_text)
+    # Iteration parts.
+    async for part in report().parts():
+        print(part.data)  # raw data
+        print(part().to_values())
+        print(part().to_lines())
+        print(part().to_columns())  # columns data orient
+        print(part().to_dicts())
 
-    # Iteration values.
-    for row_as_values in part().values():
-        print(row_as_values)
+    async for part in report().parts():
+        # Iteration lines.
+        for row_as_text in part().lines():
+            print(row_as_text)
 
-    # Iteration dicts.
-    for row_as_dict in part().dicts():
-        print(row_as_dict)
+        # Iteration values.
+        for row_as_values in part().values():
+            print(row_as_values)
+
+        # Iteration dicts.
+        for row_as_dict in part().dicts():
+            print(row_as_dict)
 
 
 ```
@@ -171,21 +172,21 @@ Will iterate over all lines of all parts
 
 from tapi_yandex_metrika import YandexMetrikaLogsapi
 
-client = YandexMetrikaLogsapi(...)
-info = await client.create().post(params=...)
-request_id = info["log_request"]["request_id"]
-report = await client.download(requestId=request_id).get()
+async with YandexMetrikaLogsapi(...) as client:
+    info = await client.create().post(params=...)
+    request_id = info["log_request"]["request_id"]
+    report = await client.download(requestId=request_id).get()
 
-print(report.columns)
+    print(report.columns)
 
-async for row_as_line in report().iter_lines():
-    print(row_as_line)
+    async for row_as_line in report().iter_lines():
+        print(row_as_line)
 
-async for row_as_values in report().iter_values():
-    print(row_as_values)
+    async for row_as_values in report().iter_values():
+        print(row_as_values)
 
-async for row_as_dict in report().iter_dicts():
-    print(row_as_dict)
+    async for row_as_dict in report().iter_dicts():
+        print(row_as_dict)
 ```
 
 ## Limit iteration
@@ -202,20 +203,20 @@ async for row_as_dict in report().iter_dicts():
 
 from tapi_yandex_metrika import YandexMetrikaLogsapi
 
-client = YandexMetrikaLogsapi(...)
-info = await client.create().post(params=...)
+async with YandexMetrikaLogsapi(...) as client:
+    info = await client.create().post(params=...)
 
-print(info.data)
-print(info.response)
-print(info.response.headers)
-print(info.status_code)
+    print(info.data)
+    print(info.response)
+    print(info.response.headers)
+    print(info.status)
 
-report = await client.download(requestId=info["log_request"]["request_id"]).get()
-async for part in report().parts():
-    print(part.data)
-    print(part.response)
-    print(part.response.headers)
-    print(part.response.status_code)
+    report = await client.download(requestId=info["log_request"]["request_id"]).get()
+    async for part in report().parts():
+        print(part.data)
+        print(part.response)
+        print(part.response.headers)
+        print(part.response.status)
 ```
 
 ## Warning

@@ -9,10 +9,10 @@ from tapi_yandex_metrika import YandexMetrikaManagement
 ACCESS_TOKEN = ""
 COUNTER_ID = ""
 
-client = YandexMetrikaManagement(
+async with YandexMetrikaManagement(
     access_token=ACCESS_TOKEN,
     default_url_params={'counterId': COUNTER_ID}
-)
+) as client:
 ```
 
 ### Resources
@@ -63,62 +63,62 @@ await client.counters().options(data: dict = None, params: dict = None)
 ```python
 from tapi_yandex_metrika import YandexMetrikaManagement
 
-client = YandexMetrikaManagement(...)
+async with YandexMetrikaManagement(...) as client:
 
-# Get counters. Via HTTP GET method.
-counters = await client.counters().get()
-print(counters.data)
+    # Get counters. Via HTTP GET method.
+    counters = await client.counters().get()
+    print(counters.data)
 
-# Get counters sorted by visit. Via HTTP GET method.
-counters = await client.counters().get(params={"sort": "Visits"})
-print(counters.data)
+    # Get counters sorted by visit. Via HTTP GET method.
+    counters = await client.counters().get(params={"sort": "Visits"})
+    print(counters.data)
 
-# Create a goal. Via HTTP POST method.
-body = {
+    # Create a goal. Via HTTP POST method.
+    body = {
+            "goal": {
+                "name": "2 страницы",
+                "type": "number",
+                "is_retargeting": 0,
+                "depth": 2
+            }
+        }
+    await client.goals().post(data=body)
+
+    # Create target on JavaScript event. Via HTTP POST method.
+    body2 = {
         "goal": {
-            "name": "2 страницы",
-            "type": "number",
+            "name": "Название вашей цели в метрике",
+            "type": "action",
             "is_retargeting": 0,
-            "depth": 2
+            "conditions": [
+                    {
+                        "type": "exact",
+                        "url": <your_value>
+                    }
+                ]
+            }
+        }
+    await client.goals().post(data=body2)
+
+    # For some resources, you need to substitute the object identifier in the url.
+    # This is done by adding an identifier to the method itself.
+    # Get information about the target. Via HTTP GET method.
+    await client.goal(goalId=10000).get()
+
+    # Change target. Via HTTP PUT method.
+    body = {
+        "goal" : {
+            "id" : <int>,
+            "name" :  <string> ,
+            "type" :  <goal_type>,
+            "is_retargeting" :  <boolean>,
+            ...
         }
     }
-await client.goals().post(data=body)
+    await client.goal(goalId=10000).put(data=body)
 
-# Create target on JavaScript event. Via HTTP POST method.
-body2 = {
-    "goal": {
-        "name": "Название вашей цели в метрике",
-        "type": "action",
-        "is_retargeting": 0,
-        "conditions": [
-                {
-                    "type": "exact",
-                    "url": <your_value>
-                }
-            ]
-        }
-    }
-await client.goals().post(data=body2)
-
-# For some resources, you need to substitute the object identifier in the url.
-# This is done by adding an identifier to the method itself.
-# Get information about the target. Via HTTP GET method.
-await client.goal(goalId=10000).get()
-
-# Change target. Via HTTP PUT method.
-body = {
-    "goal" : {
-        "id" : <int>,
-        "name" :  <string> ,
-        "type" :  <goal_type>,
-        "is_retargeting" :  <boolean>,
-        ...
-    }
-}
-await client.goal(goalId=10000).put(data=body)
-
-# Delete target. Via HTTP DELETE method.
-await client.goal(goalId=10000).delete()
+    # Delete target. Via HTTP DELETE method.
+    await client.goal(goalId=10000).delete()
 ```
 
 You can get information about the request.
@@ -126,7 +126,7 @@ You can get information about the request.
 counters = await client.counters().get()
 print(counters.response)
 print(counters.response.headers)
-print(counters.status_code)
+print(counters.status)
 ```
 
 
