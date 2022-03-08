@@ -5,7 +5,7 @@ class YandexMetrikaApiError(Exception):
 
     def __str__(self):
         return "{} {} {}\nHEADERS = {}\nURL = {}".format(
-            self.response.status_code,
+            self.response.status,
             self.response.reason,
             self.message or self.response.text,
             self.response.headers,
@@ -52,6 +52,6 @@ class BackwardCompatibilityError(Exception):
         return (
             "This {} is deprecated and not supported. "
             "Install a later version "
-            "'pip install --upgrade tapi-yandex-metrika==2020.10.20'. "
-            "Info https://github.com/pavelmaksimov/tapi-yandex-metrika"
+            "'pip install --upgrade async-tapi-yandex-metrika'. "
+            "Info https://github.com/ilindrey/async-tapi-yandex-metrika"
         ).format(self.name)
