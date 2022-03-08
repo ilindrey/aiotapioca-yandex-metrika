@@ -1,6 +1,6 @@
 # Yandex Metrika Counter Management API Documentation
 
-[Official documentation API Yandex Metrika](https://yandex.ru/dev/metrika/doc/api2/management/intro.html)
+[Official documentation API Yandex Metrika](https://yandex.com/dev/metrika/doc/api2/management/intro.html)
 
 
 ```python
@@ -30,7 +30,7 @@ print(dir(client))
 
 # Help information about the method
 client.counters().help()
-# Documentation: https://yandex.ru/dev/metrika/doc/api2/management/direct_clients/getclients-docpage/
+# Documentation: https://yandex.com/dev/metrika/doc/api2/management/direct_clients/getclients-docpage/
 # Resource path: management/v1/clients
 # Available HTTP methods:
 # ['GET']

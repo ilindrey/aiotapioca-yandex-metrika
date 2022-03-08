@@ -1,6 +1,6 @@
 # Documentation for downloading reports from Yandex Metrika LOGS API
 
-[Official documentation Yandex Metrika LOGS API](https://yandex.ru/dev/metrika/doc/api2/api_v1/data.html)
+[Official documentation Yandex Metrika LOGS API](https://yandex.com/dev/metrika/doc/api2/api_v1/data.html)
 
 ```python
 from tapi_yandex_metrika import YandexMetrikaLogsapi

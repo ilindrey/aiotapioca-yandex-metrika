@@ -86,7 +86,7 @@ class YandexMetrikaManagement:
         """
     def counters(self) -> YandexMetrikaClientExecutor:
         """
-           https://yandex.ru/dev/metrika/doc/api2/management/counters/counters-docpage/
+           https://yandex.com/dev/metrika/doc/api2/management/counters/counters-docpage/
            Allowed HTTP methods for requesting a resource: GET, POST
            GET params a resource: [callback=<string>
         & [favorite=<boolean>]
@@ -105,7 +105,7 @@ class YandexMetrikaManagement:
         self, *, counterId: Union[str, int] = None
     ) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/counters/counter-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/counters/counter-docpage/
         Allowed HTTP methods for requesting a resource: GET, DELETE, PUT
         GET params a resource: [callback=<string>] & [field=<string>]
         """
@@ -113,7 +113,7 @@ class YandexMetrikaManagement:
         self, *, counterId: Union[str, int] = None
     ) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/counters/undeletecounter-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/counters/undeletecounter-docpage/
         Allowed HTTP methods for requesting a resource: POST
         GET params a resource:
         """
@@ -121,7 +121,7 @@ class YandexMetrikaManagement:
         self, *, counterId: Union[str, int] = None
     ) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/goals/goals-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/goals/goals-docpage/
         Allowed HTTP methods for requesting a resource: GET, POST
         GET params a resource: [callback=<string>] & [useDeleted=<boolean>]
         """
@@ -129,19 +129,19 @@ class YandexMetrikaManagement:
         self, *, goalId: Union[str, int], counterId: Union[str, int] = None
     ) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/goals/goal-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/goals/goal-docpage/
         Allowed HTTP methods for requesting a resource: GET, DELETE, PUT
         GET params a resource: [callback=<string>]
         """
     def accounts(self) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/accounts/accounts-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/accounts/accounts-docpage/
         Allowed HTTP methods for requesting a resource: GET, DELETE, PUT
         GET params a resource: [callback=<string>] & [user_login=<string>]
         """
     def clients(self) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/direct_clients/getclients-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/direct_clients/getclients-docpage/
         Allowed HTTP methods for requesting a resource: GET
         GET params a resource: counters=<list>
         """
@@ -149,7 +149,7 @@ class YandexMetrikaManagement:
         self, *, counterId: Union[str, int] = None
     ) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/filters/filters-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/filters/filters-docpage/
         Allowed HTTP methods for requesting a resource: GET, POST
         GET params a resource: [callback=<string>]
         """
@@ -157,7 +157,7 @@ class YandexMetrikaManagement:
         self, *, filterId: Union[str, int], counterId: Union[str, int] = None
     ) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/filters/filter-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/filters/filter-docpage/
         Allowed HTTP methods for requesting a resource: GET, DELETE, PUT
         GET params a resource: [callback=<string>]
         """
@@ -165,7 +165,7 @@ class YandexMetrikaManagement:
         self, *, counterId: Union[str, int] = None
     ) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/operations/operations-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/operations/operations-docpage/
         Allowed HTTP methods for requesting a resource: GET, POST
         GET params a resource: [callback=<string>]
         """
@@ -173,7 +173,7 @@ class YandexMetrikaManagement:
         self, *, operationId: Union[str, int], counterId: Union[str, int] = None
     ) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/operations/operation-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/operations/operation-docpage/
         Allowed HTTP methods for requesting a resource: GET, DELETE, PUT
         GET params a resource: [callback=<string>]
         """
@@ -181,7 +181,7 @@ class YandexMetrikaManagement:
         self, *, counterId: Union[str, int] = None
     ) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/grants/grants-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/grants/grants-docpage/
         Allowed HTTP methods for requesting a resource: GET, POST
         GET params a resource: [callback=<string>]
         """
@@ -189,7 +189,7 @@ class YandexMetrikaManagement:
         self, *, counterId: Union[str, int] = None
     ) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/grants/grant-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/grants/grant-docpage/
         Allowed HTTP methods for requesting a resource: GET, PUT, DELETE
         GET params a resource: user_login=<string>
         """
@@ -197,31 +197,31 @@ class YandexMetrikaManagement:
         self, *, counterId: Union[str, int] = None
     ) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/public-grants/addgrant-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/public-grants/addgrant-docpage/
         Allowed HTTP methods for requesting a resource: POST, DELETE
         GET params a resource:
         """
     def delegates(self) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/delegates/delegates-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/delegates/delegates-docpage/
         Allowed HTTP methods for requesting a resource: GET, POST
         GET params a resource: [callback=<string>]
         """
     def delegate(self) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/delegates/deletedelegate-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/delegates/deletedelegate-docpage/
         Allowed HTTP methods for requesting a resource: DELETE
         GET params a resource: user_login=<string>
         """
     def labels(self) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/labels/getlabels-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/labels/getlabels-docpage/
         Allowed HTTP methods for requesting a resource: GET, POST
         GET params a resource: None
         """
     def label(self, *, labelId: Union[str, int]) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/labels/getlabel-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/labels/getlabel-docpage/
         Allowed HTTP methods for requesting a resource: GET, DELETE, PUT
         GET params a resource: None
         """
@@ -229,7 +229,7 @@ class YandexMetrikaManagement:
         self, *, labelId: Union[str, int], counterId: Union[str, int] = None
     ) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/links/setcounterlabel-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/links/setcounterlabel-docpage/
         Allowed HTTP methods for requesting a resource: POST, DELETE
         GET params a resource: None
         """
@@ -237,7 +237,7 @@ class YandexMetrikaManagement:
         self, *, counterId: Union[str, int] = None
     ) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/segments/getsegmentsforcounter-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/segments/getsegmentsforcounter-docpage/
         Allowed HTTP methods for requesting a resource: GET, POST
         GET params a resource: None
         """
@@ -245,7 +245,7 @@ class YandexMetrikaManagement:
         self, *, segmentId: Union[str, int], counterId: Union[str, int] = None
     ) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/segments/getsegment-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/segments/getsegment-docpage/
         Allowed HTTP methods for requesting a resource: GET, DELETE, PUT
         GET params a resource: None
         """
@@ -253,7 +253,7 @@ class YandexMetrikaManagement:
         self, *, counterId: Union[str, int] = None
     ) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/userparams/findall-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/userparams/findall-docpage/
         Allowed HTTP methods for requesting a resource: GET
         GET params a resource: None
         """
@@ -261,7 +261,7 @@ class YandexMetrikaManagement:
         self, *, uploadingId: Union[str, int], counterId: Union[str, int] = None
     ) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/userparams/findbyid-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/userparams/findbyid-docpage/
         Allowed HTTP methods for requesting a resource: GET, PUT
         GET params a resource: None
         """
@@ -269,7 +269,7 @@ class YandexMetrikaManagement:
         self, *, counterId: Union[str, int] = None
     ) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/userparams/upload-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/userparams/upload-docpage/
         Allowed HTTP methods for requesting a resource: POST
         GET params a resource: action=<user_params_uploading_action>
         """
@@ -277,7 +277,7 @@ class YandexMetrikaManagement:
         self, *, uploadingId: Union[str, int], counterId: Union[str, int] = None
     ) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/userparams/confirm-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/userparams/confirm-docpage/
         Allowed HTTP methods for requesting a resource: POST
         GET params a resource: None
         """
@@ -285,7 +285,7 @@ class YandexMetrikaManagement:
         self, *, counterId: Union[str, int] = None
     ) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/chart_annotation/findall-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/chart_annotation/findall-docpage/
         Allowed HTTP methods for requesting a resource: GET, POST
         GET params a resource: None
         """
@@ -293,7 +293,7 @@ class YandexMetrikaManagement:
         self, *, Id: Union[str, int], counterId: Union[str, int] = None
     ) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/chart_annotation/get-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/chart_annotation/get-docpage/
         Allowed HTTP methods for requesting a resource: GET, DELETE, PUT
         GET params a resource: None
         """
@@ -301,7 +301,7 @@ class YandexMetrikaManagement:
         self, *, counterId: Union[str, int] = None
     ) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/yclid-conversion/findall-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/yclid-conversion/findall-docpage/
         Allowed HTTP methods for requesting a resource: GET
         GET params a resource: [limit=<integer>] & [offset=<integer>
         """
@@ -309,7 +309,7 @@ class YandexMetrikaManagement:
         self, *, Id: Union[str, int], counterId: Union[str, int] = None
     ) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/yclid-conversion/findbyid-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/yclid-conversion/findbyid-docpage/
         Allowed HTTP methods for requesting a resource: GET
         GET params a resource: None
         """
@@ -317,7 +317,7 @@ class YandexMetrikaManagement:
         self, *, counterId: Union[str, int] = None
     ) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/yclid-conversion/upload-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/yclid-conversion/upload-docpage/
         Allowed HTTP methods for requesting a resource: GET
         GET params a resource: [comment=<string>]
         """
@@ -325,7 +325,7 @@ class YandexMetrikaManagement:
         self, *, counterId: Union[str, int] = None
     ) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/offline_conversion/findall-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/offline_conversion/findall-docpage/
         Allowed HTTP methods for requesting a resource: GET
         GET params a resource: None
         """
@@ -333,7 +333,7 @@ class YandexMetrikaManagement:
         self, *, counterId: Union[str, int] = None
     ) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/offline_conversion/findallcalluploadings-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/offline_conversion/findallcalluploadings-docpage/
         Allowed HTTP methods for requesting a resource: GET
         GET params a resource: None
         """
@@ -341,7 +341,7 @@ class YandexMetrikaManagement:
         self, *, Id: Union[str, int], counterId: Union[str, int] = None
     ) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/offline_conversion/findbyid-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/offline_conversion/findbyid-docpage/
         Allowed HTTP methods for requesting a resource: GET
         GET params a resource: None
         """
@@ -349,7 +349,7 @@ class YandexMetrikaManagement:
         self, *, Id: Union[str, int], counterId: Union[str, int] = None
     ) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/offline_conversion/findcalluploadingbyid-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/offline_conversion/findcalluploadingbyid-docpage/
         Allowed HTTP methods for requesting a resource: GET
         GET params a resource: None
         """
@@ -357,7 +357,7 @@ class YandexMetrikaManagement:
         self, *, counterId: Union[str, int] = None
     ) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/offline_conversion/upload-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/offline_conversion/upload-docpage/
         Allowed HTTP methods for requesting a resource: POST
         GET params a resource: client_id_type=<offline_conversion_uploading_client_id_type> & [comment=<string>]
         """
@@ -365,7 +365,7 @@ class YandexMetrikaManagement:
         self, *, counterId: Union[str, int] = None
     ) -> YandexMetrikaClientExecutor:
         """
-           https://yandex.ru/dev/metrika/doc/api2/management/offline_conversion/uploadcalls-docpage/
+           https://yandex.com/dev/metrika/doc/api2/management/offline_conversion/uploadcalls-docpage/
            Allowed HTTP methods for requesting a resource: POST
            GET params a resource: client_id_type=<offline_conversion_uploading_client_id_type>
         & [comment=<string>]
@@ -375,7 +375,7 @@ class YandexMetrikaManagement:
         self, *, counterId: Union[str, int] = None
     ) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/offline_conversion/enableextendedthreshold-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/offline_conversion/enableextendedthreshold-docpage/
         Allowed HTTP methods for requesting a resource: POST, DELETE
         GET params a resource: None
         """
@@ -383,7 +383,7 @@ class YandexMetrikaManagement:
         self, *, counterId: Union[str, int] = None
     ) -> YandexMetrikaClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/management/offline_conversion/enablecallsextendedthreshold-docpage/
+        https://yandex.com/dev/metrika/doc/api2/management/offline_conversion/enablecallsextendedthreshold-docpage/
         Allowed HTTP methods for requesting a resource: POST, DELETE
         GET params a resource: None
         """
@@ -428,7 +428,7 @@ class YandexMetrikaStatsClientExecutor:
         """Print docs of resource."""
     def get(self, *, params: dict = None) -> YandexMetrikaStatsClientExecutorResponse:
         """
-        https://yandex.ru/dev/metrika/doc/api2/api_v1/data.html
+        https://yandex.com/dev/metrika/doc/api2/api_v1/data.html
 
         Send HTTP 'GET' request.
 
@@ -439,7 +439,7 @@ class YandexMetrikaStatsClientExecutor:
 class YandexMetrikaStats:
     def __init__(self, *, access_token: str): ...
     def stats(self) -> YandexMetrikaStatsClientExecutor:
-        """https://yandex.ru/dev/metrika/doc/api2/api_v1/data.html"""
+        """https://yandex.com/dev/metrika/doc/api2/api_v1/data.html"""
 
 # Logs
 
@@ -527,14 +527,14 @@ class YandexMetrikaLogsapi:
         """
     def allinfo(self) -> YandexMetrikaLogsapiClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/logs/queries/getlogrequests-docpage/
+        https://yandex.com/dev/metrika/doc/api2/logs/queries/getlogrequests-docpage/
         Allowed HTTP methods for requesting a resource: GET
         """
     def info(
         self, *, requestId: Union[int, str], counterId: Union[int, str] = None
     ) -> YandexMetrikaLogsapiClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/logs/queries/getlogrequest-docpage/
+        https://yandex.com/dev/metrika/doc/api2/logs/queries/getlogrequest-docpage/
         Allowed HTTP methods for requesting a resource: GET
         """
     def download(
@@ -545,28 +545,28 @@ class YandexMetrikaLogsapi:
         counterId: Union[int, str] = None,
     ) -> YandexMetrikaLogsapiClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/logs/queries/download-docpage/
+        https://yandex.com/dev/metrika/doc/api2/logs/queries/download-docpage/
         Allowed HTTP methods for requesting a resource: GET
         """
     def clean(
         self, *, requestId: Union[int, str], counterId: Union[int, str] = None
     ) -> YandexMetrikaLogsapiClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/logs/queries/clean-docpage/
+        https://yandex.com/dev/metrika/doc/api2/logs/queries/clean-docpage/
         Allowed HTTP methods for requesting a resource: POST
         """
     def cancel(
         self, *, requestId: Union[int, str], counterId: Union[int, str] = None
     ) -> YandexMetrikaLogsapiClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/logs/queries/cancel-docpage/
+        https://yandex.com/dev/metrika/doc/api2/logs/queries/cancel-docpage/
         Allowed HTTP methods for requesting a resource: POST
         """
     def create(
         self, *, counterId: Union[int, str] = None
     ) -> YandexMetrikaLogsapiClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/logs/queries/createlogrequest-docpage/
+        https://yandex.com/dev/metrika/doc/api2/logs/queries/createlogrequest-docpage/
         Allowed HTTP methods for requesting a resource: POST
         GET params a resource: ['date1', 'date2', 'fields', 'source']
         """
@@ -574,7 +574,7 @@ class YandexMetrikaLogsapi:
         self, *, counterId: Union[int, str] = None
     ) -> YandexMetrikaLogsapiClientExecutor:
         """
-        https://yandex.ru/dev/metrika/doc/api2/logs/queries/evaluate-docpage/
+        https://yandex.com/dev/metrika/doc/api2/logs/queries/evaluate-docpage/
         Allowed HTTP methods for requesting a resource: GET
         GET params a resource: ['date1', 'date2', 'fields', 'source']
         """

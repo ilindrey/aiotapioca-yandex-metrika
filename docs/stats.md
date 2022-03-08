@@ -1,6 +1,6 @@
 # Documentation for downloading reports from API Yandex Metrika (Как скачать данные из API Яндекс Метрика)
 
-[Official documentation API Yandex Metrika](https://yandex.ru/dev/metrika/doc/api2/api_v1/data.html)
+[Official documentation API Yandex Metrika](https://yandex.com/dev/metrika/doc/api2/api_v1/data.html)
 
 ```python
 import datetime as dt
@@ -19,7 +19,7 @@ params = dict(
     dimensions="ym:s:date",
     sort="ym:s:date",
     lang="en",
-    # Other params -> https://yandex.ru/dev/metrika/doc/api2/api_v1/data.html
+    # Other params -> https://yandex.com/dev/metrika/doc/api2/api_v1/data.html
 )
 report = await client.stats().get(params=params)
 

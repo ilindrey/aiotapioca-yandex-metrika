@@ -26,7 +26,7 @@ async def test_get_help_info():
     async with YandexMetrikaStats(**default_params) as client:
         help_info = client.stats().help()
         assert (
-            "https://yandex.ru/dev/metrika/doc/api2/api_v1/intro-docpage/" in help_info
+            "https://yandex.com/dev/metrika/doc/api2/api_v1/intro-docpage/" in help_info
         )
         assert "stat/v1/data" in help_info
 
