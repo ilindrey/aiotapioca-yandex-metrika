@@ -35,7 +35,7 @@ setup(
     url="https://github.com/ilindrey/async-tapi-yandex-metrika",
     packages=[package],
     include_package_data=False,
-    install_requires=["aiohttp", "async-tapi-wrapper==0.1.2"],
+    install_requires=["aiohttp", "async-tapi-wrapper>=1.0.0"],
     extras_require={
         "dev": [
             "black>=22.0",
