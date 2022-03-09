@@ -4,7 +4,7 @@ import random
 import re
 import time
 
-from async_tapi import TapiAdapter, generate_wrapper_from_adapter, JSONAdapterMixin
+from async_tapi import TAPIAdapter, generate_wrapper_from_adapter
 from async_tapi.exceptions import ResponseProcessException
 
 from . import exceptions
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 LIMIT = 10000
 
 
-class YandexMetrikaClientAdapterAbstract(JSONAdapterMixin, TapiAdapter):
+class YandexMetrikaClientAdapterAbstract(TAPIAdapter):
     def get_api_root(self, api_params, resource_name):
         return "https://api-metrika.yandex.net/"
 

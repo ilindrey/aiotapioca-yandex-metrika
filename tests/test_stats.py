@@ -1,5 +1,4 @@
 import json
-from copy import deepcopy
 from aioresponses import aioresponses, CallbackResult
 
 from async_tapi_yandex_metrika import YandexMetrikaStats
