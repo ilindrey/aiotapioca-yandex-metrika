@@ -1,6 +1,6 @@
 from aioresponses import aioresponses, CallbackResult
 
-from async_tapi_yandex_metrika import YandexMetrikaManagement
+from aiotapioca_yandex_metrika import YandexMetrikaManagement
 from response_data import COUNTERS_DATA, GOALS_DATA, GOAL_DATA
 
 
@@ -28,13 +28,15 @@ async def test_get_counters():
 
             response = await client.counters().get()
 
-            assert response.status == 200
-            assert response.data["rows"] == 2
-            assert len(response.data["counters"]) == 2
-            assert response.data["counters"][0]["id"] == 12345678
-            assert response.data["counters"][0]["name"] == "counter 1"
-            assert response.data["counters"][1]["id"] == 87654321
-            assert response.data["counters"][1]["name"] == "counter 2"
+            response_data = response().data
+
+            assert response().status == 200
+            assert response_data["rows"] == 2
+            assert len(response_data["counters"]) == 2
+            assert response_data["counters"][0]["id"] == 12345678
+            assert response_data["counters"][0]["name"] == "counter 1"
+            assert response_data["counters"][1]["id"] == 87654321
+            assert response_data["counters"][1]["name"] == "counter 2"
 
 
 async def test_get_goals():
@@ -50,12 +52,14 @@ async def test_get_goals():
 
             response = await client.goals(counterId=12345648).get()
 
-            assert response.status == 200
-            assert len(response.data["goals"]) == 2
-            assert response.data["goals"][0]["id"] == 1234567
-            assert response.data["goals"][0]["name"] == "goal 1"
-            assert response.data["goals"][1]["id"] == 7654321
-            assert response.data["goals"][1]["name"] == "goal 2"
+            response_data = response().data
+
+            assert response().status == 200
+            assert len(response_data["goals"]) == 2
+            assert response_data["goals"][0]["id"] == 1234567
+            assert response_data["goals"][0]["name"] == "goal 1"
+            assert response_data["goals"][1]["id"] == 7654321
+            assert response_data["goals"][1]["name"] == "goal 2"
 
 
 async def test_get_goal():
@@ -73,6 +77,8 @@ async def test_get_goal():
 
             response = await client.goal(**params).get()
 
-            assert isinstance(response.data["goal"], dict)
-            assert response.data["goal"]["id"] == 1234567
-            assert response.data["goal"]["name"] == "goal 1"
+            response_data = response().data
+
+            assert isinstance(response_data["goal"], dict)
+            assert response_data["goal"]["id"] == 1234567
+            assert response_data["goal"]["name"] == "goal 1"

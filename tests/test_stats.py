@@ -1,7 +1,7 @@
 import json
-from aioresponses import aioresponses, CallbackResult
+from aioresponses import aioresponses
 
-from async_tapi_yandex_metrika import YandexMetrikaStats
+from aiotapioca_yandex_metrika import YandexMetrikaStats
 from response_data import REPORTS_DATA
 from utils import make_url
 
@@ -21,15 +21,6 @@ url_params = dict(
 )
 
 
-async def test_get_help_info():
-    async with YandexMetrikaStats(**default_params) as client:
-        help_info = client.stats().help()
-        assert (
-            "https://yandex.com/dev/metrika/doc/api2/api_v1/intro-docpage/" in help_info
-        )
-        assert "stat/v1/data" in help_info
-
-
 async def test_stats_data():
     async with YandexMetrikaStats(**default_params) as client:
         with aioresponses() as mocked:
@@ -43,11 +34,11 @@ async def test_stats_data():
 
             response = await client.stats().get(params=url_params)
 
-            assert response.data["query"]["ids"] == [100500]
-            assert response.data["query"]["limit"] == 1
-            assert len(response.data["data"]) > 0
-            assert len(response.data["totals"]) > 0
-            assert response.data["totals"][0] > 0
+            assert response.query.ids().data == [100500]
+            assert response.query.limit().data == 1
+            assert len(response.data().data) > 0
+            assert len(response.totals().data) > 0
+            assert response.totals().data[0] > 0
 
 
 async def test_transform():
@@ -64,7 +55,7 @@ async def test_transform():
 
             response_data = json.loads(REPORTS_DATA)
 
-            assert response.data == response_data
+            assert response().data == response_data
             assert response().to_values() == [
                 ["2020-10-01", 14234.0],
                 ["2020-10-02", 12508.0],
@@ -105,53 +96,31 @@ async def test_iteration():
             i = 0
             max_pages = 1
             async for page in report().pages(max_pages=max_pages):
-                assert page.data == response_data
+                assert page().data == response_data
 
-                for row in page().values():
+                for row in page().to_values():
                     assert len(row) == 2
                     assert isinstance(row, list)
                     assert isinstance(row[0], str)
                     assert isinstance(row[1], float)
 
-                for row in page().dicts():
+                for row in page().to_dicts():
                     assert len(row) == 2
                     assert isinstance(row, dict)
                     assert isinstance(row["ym:s:date"], str)
                     assert isinstance(row["ym:s:visits"], float)
+
+                for index, row in enumerate(page().to_columns()):
+                    assert len(row) == 5
+                    assert isinstance(row, list)
+                    for item in row:
+                        if index == 0:
+                            assert isinstance(item, str)
+                        elif index == 1:
+                            assert isinstance(item, float)
 
                 response_data["query"]["offset"] += response_data["query"]["offset"] + 1
 
                 i += 1
 
             assert i == max_pages
-
-        with aioresponses() as mocked:
-
-            mocked.get(url_1, body=REPORTS_DATA, status=200, content_type="application/json")
-            mocked.get(url_2, body=REPORTS_DATA, status=200, content_type="application/json")
-
-            report = await client.stats().get(params=dict(url_params))
-
-            i = 0
-            async for row in report().iter_values(max_pages=1):
-                assert len(row) == 2
-                assert isinstance(row, list)
-                assert isinstance(row[0], str)
-                assert isinstance(row[1], float)
-                i += 1
-            assert i == len(response_data['data'])
-
-        with aioresponses() as mocked:
-            mocked.get(url_1, body=REPORTS_DATA, status=200, content_type="application/json")
-            mocked.get(url_2, body=REPORTS_DATA, status=200, content_type="application/json")
-
-            report = await client.stats().get(params=dict(url_params))
-
-            i = 0
-            async for row in report().iter_dicts(max_pages=1):
-                assert len(row) == 2
-                assert isinstance(row, dict)
-                assert isinstance(row["ym:s:date"], str)
-                assert isinstance(row["ym:s:visits"], float)
-                i += 1
-            assert i == len(response_data['data'])
