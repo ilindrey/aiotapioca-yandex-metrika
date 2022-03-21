@@ -11,7 +11,7 @@ import re
 with open("README.md", "r", encoding="utf8") as fh:
     readme = fh.read()
 
-package = "async_tapi_yandex_metrika"
+package = "aiotapioca_yandex_metrika"
 
 
 def get_version(package):
@@ -25,7 +25,7 @@ def get_version(package):
 
 
 setup(
-    name="async-tapi-yandex-metrika",
+    name=package,
     version=get_version(package),
     description="Python client for API Yandex Metrika",
     long_description=readme,
@@ -35,7 +35,7 @@ setup(
     url="https://github.com/ilindrey/async-tapi-yandex-metrika",
     packages=[package],
     include_package_data=False,
-    install_requires=["aiohttp", "async-tapi-wrapper>=1.0.0"],
+    install_requires=["aiohttp>=3.0", "aiotapioca-wrapper>=3.1.1"],
     extras_require={
         "dev": [
             "black>=22.0",
