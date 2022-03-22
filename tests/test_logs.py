@@ -1,7 +1,8 @@
 import json
+from io import StringIO
 from aioresponses import aioresponses
 
-from async_tapi_yandex_metrika import YandexMetrikaLogsapi
+from aiotapioca_yandex_metrika import YandexMetrikaLogsAPI
 from response_data import LOGS_DATA
 from utils import make_url
 
@@ -14,7 +15,7 @@ default_params = dict(
 
 
 async def test_create():
-    async with YandexMetrikaLogsapi(**default_params) as client:
+    async with YandexMetrikaLogsAPI(**default_params) as client:
         with aioresponses() as mocked:
             response_data = {
                 "log_request": {
@@ -42,10 +43,11 @@ async def test_create():
             )
             response = await client.create().post(params=url_params)
 
-            assert "log_request" in response.data
-            assert response.data["log_request"]["status"] == "created"
-            assert response.data["log_request"]["date1"] == url_params["date1"]
-            assert response.data["log_request"]["date2"] == url_params["date2"]
+            assert "log_request" in dir(response)
+            assert response.log_request.status().data == "created"
+            assert response.log_request.date1().data == url_params["date1"]
+            assert response.log_request.date2().data == url_params["date2"]
+            assert response().data == response_data
 
 
 async def test_get_allinfo():
@@ -77,21 +79,23 @@ async def test_get_allinfo():
             },
         ]
     }
-    async with YandexMetrikaLogsapi(**default_params) as client:
+    async with YandexMetrikaLogsAPI(**default_params) as client:
         with aioresponses() as mocked:
 
-            mocked.get(client.allinfo().data,
-                       body=json.dumps(response_data, default=str),
-                       status=200,
-                       content_type="application/json",)
+            mocked.get(
+                client.allinfo().data,
+                body=json.dumps(response_data, default=str),
+                status=200,
+                content_type="application/json",
+            )
 
             response = await client.allinfo().get()
 
-            assert response.data == response_data
+            assert response().data == response_data
 
 
 async def test_transform():
-    async with YandexMetrikaLogsapi(**default_params) as client:
+    async with YandexMetrikaLogsAPI(**default_params) as client:
         with aioresponses() as mocked:
             mocked.get(
                 "https://api-metrika.yandex.net/management/v1/counter/100500/logrequest/0/part/0/download",
@@ -100,7 +104,8 @@ async def test_transform():
             )
             log = await client.download(requestId=0).get()
 
-            assert log.columns == ["col1", "col2"]
+            assert log().to_headers() == ["col1", "col2"]
+
             assert log().to_values() == [
                 ["val1", "val2"],
                 ["val11", "val22"],
@@ -128,16 +133,31 @@ async def test_transform():
 async def test_iteration():
 
     columns = LOGS_DATA.split("\n")[0].split("\t")
+
+    def _iter_line(text):
+        f = StringIO(text)
+        next(f)  # skipping columns
+        return (line.replace("\n", "") for line in f)
+
+    def to_columns(data):
+        c = [[] for _ in range(len(columns))]
+        for line in _iter_line(data):
+            values = line.split("\t")
+            for i, col in enumerate(c):
+                col.append(values[i])
+        return c
+
     expected_lines = LOGS_DATA.split("\n")[1:]
     expected_values = [i.split("\t") for i in LOGS_DATA.split("\n")[1:]]
+    expected_columns = to_columns(LOGS_DATA)
     expected_dicts = [
         dict(zip(columns, i.split("\t"))) for i in LOGS_DATA.split("\n")[1:]
-        ]
+    ]
 
     url_1 = "https://api-metrika.yandex.net/management/v1/counter/100500/logrequest/0/part/0/download"
     url_2 = "https://api-metrika.yandex.net/management/v1/counter/100500/logrequest/0/part/1/download"
 
-    async with YandexMetrikaLogsapi(**default_params) as client:
+    async with YandexMetrikaLogsAPI(**default_params) as client:
 
         # parts
         with aioresponses() as mocked:
@@ -147,51 +167,26 @@ async def test_iteration():
 
             log = await client.download(requestId=0).get()
 
-            async for part in log().parts(max_parts=1):
-                assert 4 == len(list(part().lines()))
-                assert 4 == len(list(part().values()))
+            max_parts = 1
+            async for part in log().pages(max_pages=max_parts):
+                assert len(part().to_lines()) == 4
+                assert len(part().to_values()) == 4
+                assert len(part().to_columns()) == 2
+                assert len(part().to_dicts()) == 4
 
-                for line, expected in zip(part().lines(), expected_lines):
+                assert part().to_headers() == ["col1", "col2"]
+
+                for line, expected in zip(part().to_lines(), expected_lines):
                     assert line == expected
 
-                for values, expected in zip(part().values(), expected_values):
+                for values, expected in zip(part().to_values(), expected_values):
                     assert values == expected
 
-                for values, expected in zip(part().dicts(), expected_dicts):
+                for values, expected in zip(part().to_columns(), expected_columns):
                     assert values == expected
 
-        # iter_lines
-        with aioresponses() as mocked:
-
-            mocked.get(url_1, body=LOGS_DATA, status=200)
-            mocked.get(url_2, body=LOGS_DATA, status=200)
-
-            log = await client.download(requestId=0).get()
-
-            async for line in log().iter_lines(max_rows=3):
-                assert line in expected_lines
-
-        # iter_values
-        with aioresponses() as mocked:
-
-            mocked.get(url_1, body=LOGS_DATA, status=200)
-            mocked.get(url_2, body=LOGS_DATA, status=200)
-
-            log = await client.download(requestId=0).get()
-
-            async for values in log().iter_values(max_rows=3):
-                assert values in expected_values[:4]
-
-        # iter_dicts
-        with aioresponses() as mocked:
-
-            mocked.get(url_1, body=LOGS_DATA, status=200)
-            mocked.get(url_2, body=LOGS_DATA, status=200)
-
-            log = await client.download(requestId=0).get()
-
-            async for values in log().iter_dicts(max_rows=3):
-                assert values in expected_dicts[:4]
+                for values, expected in zip(part().to_dicts(), expected_dicts):
+                    assert values == expected
 
 
 """
@@ -244,4 +239,3 @@ def test_cancel():
     print(r)
 
 """
-

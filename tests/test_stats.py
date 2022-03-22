@@ -34,6 +34,7 @@ async def test_stats_data():
 
             response = await client.stats().get(params=url_params)
 
+            assert response().data == json.loads(REPORTS_DATA)
             assert response.query.ids().data == [100500]
             assert response.query.limit().data == 1
             assert len(response.data().data) > 0
@@ -56,6 +57,8 @@ async def test_transform():
             response_data = json.loads(REPORTS_DATA)
 
             assert response().data == response_data
+            assert response().to_headers() == ["ym:s:date", "ym:s:visits"]
+
             assert response().to_values() == [
                 ["2020-10-01", 14234.0],
                 ["2020-10-02", 12508.0],
@@ -88,15 +91,21 @@ async def test_iteration():
 
         with aioresponses() as mocked:
 
-            mocked.get(url_1, body=REPORTS_DATA, status=200, content_type="application/json")
-            mocked.get(url_2, body=REPORTS_DATA, status=200, content_type="application/json")
+            mocked.get(
+                url_1, body=REPORTS_DATA, status=200, content_type="application/json"
+            )
+            mocked.get(
+                url_2, body=REPORTS_DATA, status=200, content_type="application/json"
+            )
 
             report = await client.stats().get(params=dict(url_params))
 
             i = 0
             max_pages = 1
             async for page in report().pages(max_pages=max_pages):
+
                 assert page().data == response_data
+                assert page().to_headers() == ["ym:s:date", "ym:s:visits"]
 
                 for row in page().to_values():
                     assert len(row) == 2

@@ -1,8 +1,9 @@
-import io
+import json
 import logging
 import random
 import re
 import time
+from aiohttp.client_exceptions import ContentTypeError
 
 from aiotapioca import TapiocaAdapter, JSONAdapterMixin, generate_wrapper_from_adapter
 from aiotapioca.exceptions import ResponseProcessException
@@ -13,7 +14,7 @@ from .resource_mapping import (
     LOGSAPI_RESOURCE_MAPPING,
     MANAGEMENT_RESOURCE_MAPPING,
 )
-from .serializers import StatsSerializer
+from .serializers import StatsSerializer, LogsAPISerializer
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +35,7 @@ class YandexMetrikaClientAdapterAbstract(JSONAdapterMixin, TapiocaAdapter):
         )
         return arguments
 
-    async def get_error_message(self, data, response=None):
+    async def get_error_message(self, data, response=None, **kwargs):
         if data is None:
             return {"error_text": await response.text()}
         else:
@@ -43,8 +44,8 @@ class YandexMetrikaClientAdapterAbstract(JSONAdapterMixin, TapiocaAdapter):
     def format_data_to_request(self, data):
         return data
 
-    async def process_response(self, response):
-        data = await super().process_response(response)
+    async def process_response(self, response, **kwargs):
+        data = await super().process_response(response, **kwargs)
         if isinstance(data, dict) and "errors" in data:
             raise ResponseProcessException(response, data)
         return data
@@ -131,9 +132,6 @@ class YandexMetrikaClientAdapterAbstract(JSONAdapterMixin, TapiocaAdapter):
             else:
                 raise exceptions.YandexMetrikaClientError(response, **error_message)
 
-    def transform(self, **kwargs):
-        raise exceptions.BackwardCompatibilityError("method 'transform'")
-
 
 class YandexMetrikaManagementClientAdapter(YandexMetrikaClientAdapterAbstract):
     resource_mapping = MANAGEMENT_RESOURCE_MAPPING
@@ -141,23 +139,19 @@ class YandexMetrikaManagementClientAdapter(YandexMetrikaClientAdapterAbstract):
 
 class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
     resource_mapping = LOGSAPI_RESOURCE_MAPPING
+    serializer_class = LogsAPISerializer
 
-    def get_request_kwargs(self, api_params, *args, **kwargs):
-        arguments = super().get_request_kwargs(api_params, *args, **kwargs)
-        # if "download" in request_kwargs["url"]:
-        #     kwargs["store"]["columns"] = data[: data.find("\n")].split("\t")
-        # else:
-        #     kwargs["store"].pop("columns", None)
-        return arguments
-
-
-    # async def process_response(self, response, request_kwargs, **kwargs):
-    #     data = await super().process_response(response, request_kwargs, **kwargs)
-    #     if "download" in request_kwargs["url"]:
-    #         kwargs["store"]["columns"] = data[: data.find("\n")].split("\t")
-    #     else:
-    #         kwargs["store"].pop("columns", None)
-    #     return data
+    async def response_to_native(self, response, **kwargs):
+        try:
+            return await response.json()
+        except ContentTypeError:
+            text = await response.text()
+            try:
+                return json.loads(text)
+            except json.JSONDecodeError:
+                return text
+        except json.JSONDecodeError:
+            return await response.text()
 
     def error_handling(
         self,
@@ -242,13 +236,14 @@ class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
             **kwargs
         )
 
-    def fill_resource_template_url(self, template, params, resource):
-        if resource == "download" and not params.get("partNumber"):
-            params.update(partNumber=0)
-        return super().fill_resource_template_url(template, params, resource)
+    def fill_resource_template_url(self, template, url_params, **kwargs):
+        resource = kwargs.get("resource")
+        if "download" in resource["resource"] and not url_params.get("partNumber"):
+            url_params.update(partNumber=0)
+        return super().fill_resource_template_url(template, url_params, **kwargs)
 
     def get_iterator_next_request_kwargs(
-        self, response_data, response, request_kwargs, api_params, **kwargs
+        self, request_kwargs, data, response, **kwargs
     ):
         url = request_kwargs["url"]
 
@@ -260,89 +255,25 @@ class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
         new_url = re.sub(r"part/[0-9]*/", "part/{}/".format(next_part), url)
         return {**request_kwargs, "url": new_url}
 
-    def _iter_line(self, text, **kwargs):
-        if "download" not in kwargs["request_kwargs"]["url"]:
-            raise NotImplementedError("Only available for download resource responses")
-
-        f = io.StringIO(text)
-        next(f)  # skipping columns
-        return (line.replace("\n", "") for line in f)
-
-    def get_iterator_iteritems(self, response_data, **kwargs):
-        if response_data:
-            return self._iter_line(response_data, **kwargs)
+    def get_iterator_list(self, data, **kwargs):
+        if data:
+            return [data]
         else:
             return []
-
-    def get_iterator_pages(self, response_data, **kwargs):
-        if response_data:
-            return [response_data]
-        else:
-            return []
-
-    def get_iterator_items(self, data, **kwargs):
-        return self._iter_line(data, **kwargs)
-
-    async def parts(self, max_parts=None, **kwargs):
-        client = kwargs["client"]
-        async for part in client.pages(max_pages=max_parts):
-            yield part
-
-    # async def iter_lines(self, max_parts=None, max_rows=None, **kwargs):
-    #     max_rows = max_rows or kwargs.get("max_items")
-    #     client = kwargs["client"]
-    #     async for item in client.iter_items(max_pages=max_parts, max_items=max_rows):
-    #         yield item
-    #
-    # async def iter_values(self, max_parts=None, max_rows=None, **kwargs):
-    #     max_rows = max_rows or kwargs.get("max_items")
-    #     client = kwargs["client"]
-    #     async for line in client.iter_items(max_pages=max_parts, max_items=max_rows):
-    #         yield line.split("\t")
-    #
-    # async def iter_dicts(self, max_parts=None, max_rows=None, **kwargs):
-    #     max_rows = max_rows or kwargs.get("max_items")
-    #     client = kwargs["client"]
-    #     async for values in client.iter_values(max_pages=max_parts, max_items=max_rows):
-    #         yield dict(zip(kwargs["store"]["columns"], values))
-
-    def lines(self, max_rows=None, **kwargs):
-        max_rows = max_rows or kwargs.get("max_items")
-        client = kwargs["client"]
-        yield from client.items(max_items=max_rows)
-
-    def values(self, max_rows=None, **kwargs):
-        max_rows = max_rows or kwargs.get("max_items")
-        client = kwargs["client"]
-        for line in client.items(max_items=max_rows):
-            yield line.split("\t")
-
-    def dicts(self, max_rows=None, **kwargs):
-        max_rows = max_rows or kwargs.get("max_items")
-        client = kwargs["client"]
-        for line in client.items(max_items=max_rows):
-            yield dict(zip(kwargs["store"]["columns"], line.split("\t")))
-
-    def to_dicts(self, data, **kwargs):
-        return [
-            dict(zip(kwargs["store"]["columns"], line.split("\t")))
-            for line in data.split("\n")[1:]
-            if line
-        ]
 
 
 class YandexMetrikaStatsClientAdapter(YandexMetrikaClientAdapterAbstract):
     resource_mapping = STATS_RESOURCE_MAPPING
     serializer_class = StatsSerializer
 
-    async def process_response(self, response):
-        data = await super().process_response(response)
+    async def process_response(self, response, **kwargs):
+        data = await super().process_response(response, **kwargs)
         attribution = data["query"]["attribution"]
         sampled = data["sampled"]
         sample_share = data["sample_share"]
         total_rows = int(data["total_rows"])
         offset = data["query"]["offset"]
-        limit = int(response.url.query.get('limit', LIMIT))
+        limit = int(response.url.query.get("limit", LIMIT))
         offset2 = offset + limit - 1
         if offset2 > total_rows:
             offset2 = total_rows
@@ -357,18 +288,18 @@ class YandexMetrikaStatsClientAdapter(YandexMetrikaClientAdapterAbstract):
         return data
 
     def get_iterator_next_request_kwargs(
-        self, iterator_request_kwargs, response_data, response
+        self, request_kwargs, data, response, **kwargs
     ):
-        total_rows = int(response_data["total_rows"])
-        limit = iterator_request_kwargs["params"].get("limit", LIMIT)
-        offset = response_data["query"]["offset"] + limit
+        total_rows = int(data["total_rows"])
+        limit = request_kwargs["params"].get("limit", LIMIT)
+        offset = data["query"]["offset"] + limit
 
         if offset <= total_rows:
-            iterator_request_kwargs["params"]["offset"] = offset
-            return iterator_request_kwargs
+            request_kwargs["params"]["offset"] = offset
+            return request_kwargs
 
-    def get_iterator_list(self, response_data, **kwargs):
-        return [response_data]
+    def get_iterator_list(self, data, **kwargs):
+        return [data]
 
 
 YandexMetrikaStats = generate_wrapper_from_adapter(YandexMetrikaStatsClientAdapter)
