@@ -3,7 +3,7 @@
 [Official documentation Yandex Metrika LOGS API](https://yandex.com/dev/metrika/doc/api2/api_v1/data.html)
 
 ```python
-from tapi_yandex_metrika import YandexMetrikaLogsapi
+from aiotapioca_yandex_metrika import YandexMetrikaLogsAPI
 
 ACCESS_TOKEN = ""
 COUNTER_ID = ""
@@ -15,7 +15,7 @@ params = {
     "date2": "2021-01-01"
 }
 
-async with YandexMetrikaLogsapi(
+async with YandexMetrikaLogsAPI(
     access_token=ACCESS_TOKEN,
     default_url_params={'counterId': COUNTER_ID}
 ) as client:
@@ -27,7 +27,7 @@ async with YandexMetrikaLogsapi(
 
     # Order a report. Via HTTP POST method.
     result = await client.create().post(params=params)
-    request_id = result["log_request"]["request_id"]
+    request_id = result().data["log_request"]["request_id"]
     print(result)
 
 
@@ -67,20 +67,25 @@ async with YandexMetrikaLogsapi(
         # Default partNumber=0
         part = await client.download(requestId=request_id, partNumber=0).get()
 
+        executor = part()
+
         print("Raw data")
-        data = part.data[:1000]
+        data = executor.data[:1000]
 
         print("Column names")
-        print(part.columns)
+        print(executor.to_headers())
 
         # Transform to values
-        print(part().to_values()[:3])
+        print(executor.to_values()[:3])
 
         # Transform to lines
-        print(part().to_lines()[:3])
+        print(executor.to_lines()[:3])
 
         # Transform to dicts
-        print(part().to_dicts()[:3])
+        print(executor.to_dicts()[:3])
+
+        # Transform to columns
+        print(executor.to_columns()[:3])
     else:
         print("Report not ready yet")
 ```
@@ -90,7 +95,7 @@ async with YandexMetrikaLogsapi(
 add param **wait_report**
 
 ```python
-from tapi_yandex_metrika import YandexMetrikaLogsapi
+from aiotapioca_yandex_metrika import YandexMetrikaLogsAPI
 
 ACCESS_TOKEN = ""
 COUNTER_ID = ""
@@ -101,7 +106,7 @@ params={
     "date1": "2019-01-01",
     "date2": "2019-01-01"
 }
-async with YandexMetrikaLogsapi(
+async with YandexMetrikaLogsAPI(
     access_token=ACCESS_TOKEN,
     default_url_params={'counterId': COUNTER_ID},
     # Download the report when it will be created
@@ -112,27 +117,32 @@ async with YandexMetrikaLogsapi(
 
     report = await client.download(requestId=request_id).get()
 
+    executor = report()
+
     print("Raw data")
-    data = report.data
+    data = executor.data
 
     print("Column names")
-    print(report.columns)
+    print(executor.to_headers())
 
     # Transform to values
-    print(report().to_values())
+    print(executor.to_values())
 
     # Transform to lines
-    print(report().to_lines())
+    print(executor.to_lines())
 
     # Transform to dict
-    print(report().to_dicts())
+    print(executor.to_dicts())
+
+    # Transform to columns
+    print(executor.to_columns())
 ```
 
 ## Export of all report parts.
 ```python
-from tapi_yandex_metrika import YandexMetrikaLogsapi
+from aiotapioca_yandex_metrika import YandexMetrikaLogsAPI
 
-async with YandexMetrikaLogsapi(...) as client:
+async with YandexMetrikaLogsAPI(...) as client:
 
     info = await client.create().post(params=...)
     request_id = info["log_request"]["request_id"]
@@ -141,82 +151,56 @@ async with YandexMetrikaLogsapi(...) as client:
     print(report.columns)
 
     # Iteration parts.
-    async for part in report().parts():
-        print(part.data)  # raw data
-        print(part().to_values())
-        print(part().to_lines())
-        print(part().to_columns())  # columns data orient
-        print(part().to_dicts())
+    async for part in report().page():
+        executor = part()
+        print(executor.data)  # raw data
+        print(executor.to_values())
+        print(executor.to_lines())
+        print(executor.to_columns())  # columns data orient
+        print(executor.to_dicts())
 
-    async for part in report().parts():
+    async for part in report().page():
         # Iteration lines.
-        for row_as_text in part().lines():
+        for row_as_text in part().to_lines():
             print(row_as_text)
 
         # Iteration values.
-        for row_as_values in part().values():
+        for row_as_values in part().to_values():
             print(row_as_values)
 
         # Iteration dicts.
-        for row_as_dict in part().dicts():
+        for row_as_dict in part().to_dicts():
             print(row_as_dict)
 
 
 ```
 
-## Iterate all rows of all parts of the report
-
-Will iterate over all lines of all parts
-
-```python
-
-from tapi_yandex_metrika import YandexMetrikaLogsapi
-
-async with YandexMetrikaLogsapi(...) as client:
-    info = await client.create().post(params=...)
-    request_id = info["log_request"]["request_id"]
-    report = await client.download(requestId=request_id).get()
-
-    print(report.columns)
-
-    async for row_as_line in report().iter_lines():
-        print(row_as_line)
-
-    async for row_as_values in report().iter_values():
-        print(row_as_values)
-
-    async for row_as_dict in report().iter_dicts():
-        print(row_as_dict)
-```
-
 ## Limit iteration
 
-    .parts(max_parts: int = None)
-    .lines(max_rows: int = None)
-    .values(max_rows: int = None)
-    .iter_lines(max_parts: int = None, max_rows: int = None)
-    .iter_values(max_parts: int = None, max_rows: int = None)
+    .pages(max_pages: int = None, max_items: int = None)
 
 ## Response
 
 ```python
 
-from tapi_yandex_metrika import YandexMetrikaLogsapi
+from aiotapioca_yandex_metrika import YandexMetrikaLogsAPI
 
-async with YandexMetrikaLogsapi(...) as client:
+async with YandexMetrikaLogsAPI(...) as client:
     info = await client.create().post(params=...)
 
-    print(info.data)
-    print(info.response)
-    print(info.response.headers)
-    print(info.status)
+    executor = info()
+    print(executor.data)
+    print(executor.response)
+    print(executor.response.headers)
+    print(executor.status)
 
     report = await client.download(requestId=info["log_request"]["request_id"]).get()
-    async for part in report().parts():
-        print(part.data)
-        print(part.response)
-        print(part.response.headers)
-        print(part.response.status)
+    async for part in report().pages():
+        executor = part()
+        print(executor.data)
+        print(executor.response)
+        print(executor.response.headers)
+        print(executor.response.status)
 ```
 
 ## Warning
@@ -231,21 +215,9 @@ And evaluate method only with GET method
     await client.evaluate().get(params=params)
 
 
-## AUTHORS
-Pavel Maksimov -
-[Telegram](https://t.me/pavel_maksimow),
-[Facebook](https://www.facebook.com/pavel.maksimow)
-
-Good luck friend! Put an asterisk;)
-
-Удачи тебе, друг! Поставь звездочку ;)
-
-Copyright (c) Pavel Maksimov.
-
-
 ## CHANGELOG
-### Release 2022.1.5
-- asynchrony added
+### Release 2022.3.23
+- The library is now asynchronous, based on aiotapioca-wrapper
 
 ### Release 2021.5.28
 - Add stub file (syntax highlighting)

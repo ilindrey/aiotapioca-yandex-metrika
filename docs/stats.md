@@ -4,7 +4,7 @@
 
 ```python
 import datetime as dt
-from tapi_yandex_metrika import YandexMetrikaStats
+from aiotapioca_yandex_metrika import YandexMetrikaStats
 
 ACCESS_TOKEN = ""
 COUNTER_ID = ""
@@ -24,9 +24,14 @@ async with YandexMetrikaStats(access_token=ACCESS_TOKEN) as client:
     report = await client.stats().get(params=params)
 
     # Raw data
-    print(report.data)
+    print(report().data)
+    print(report.query.ids().data)
+    print(report.query.limit().data)
+    print(report.data().data)
+    print(report.totals().data)
 
-    print(report.columns)
+
+    print(report().to_headers())
     # ['ym:s:date', 'ym:s:visits']
 
     report().to_values()
@@ -51,24 +56,26 @@ async with YandexMetrikaStats(access_token=ACCESS_TOKEN) as client:
 
 ## Export of all report pages.
 ```python
-from tapi_yandex_metrika import YandexMetrikaStats
+from aiotapioca_yandex_metrika import YandexMetrikaStats
 
 async with YandexMetrikaStats(access_token=...) as client:
     report = await client.stats().get(params=...)
 
     print("iteration report pages")
     async for page in report().pages():
-        # Raw data.
-        print(page.data)
+        executor = page()
 
-        print(page().to_dicts())
-        print(page().to_columns())
-        print(page().to_values())
+        # Raw data.
+        print(executor.data)
+
+        print(executor.to_dicts())
+        print(executor.to_columns())
+        print(executor.to_values())
 
     print("iteration report pages")
     async for page in report().pages():
         print("iteration rows as values")
-        for row_as_values_of_page in page().values():
+        for row_as_values_of_page in page().to_values():
             print(row_as_values_of_page)
         # ['2020-10-01', 14234.0]
         # ['2020-10-02', 12508.0]
@@ -78,43 +85,20 @@ async with YandexMetrikaStats(access_token=...) as client:
         # ['2020-10-06', 12795.0]
 
         print("iteration rows as dict")
-        for row_as_dict_of_page in page().dicts():
+        for row_as_dict_of_page in page().to_dicts():
             print(row_as_dict_of_page)
-```
 
-## Iterate all rows of all parts of the report
-
-Will iterate over all lines of all pages
-
-```python
-from tapi_yandex_metrika import YandexMetrikaStats
-
-async with YandexMetrikaStats(access_token=...) as client:
-    report = await client.stats().get(params=...)
-
-    async for values in report().iter_values():
-        print(values)
-    # ['2020-10-01', 14234.0]
-    # ['2020-10-02', 12508.0]
-    # ['2020-10-03', 12365.0]
-    # ['2020-10-04', 14588.0]
-    # ['2020-10-05', 14579.0]
-    # ['2020-10-06', 12795.0]
-
-    async for row_as_dict in report().iter_dicts():
-        print(row_as_dict)
+        print("iteration rows as column")
+        for row_as_dict_of_page in page().to_columns():
+            print(row_as_dict_of_page)
 ```
 
 ## Iteration limit.
 
-    .pages(max_pages: int = None)
-    .values(max_rows: int = None)
-    .dicts(max_rows: int = None)
-    .iter_values(max_pages: int = None, max_rows: int = None)
-    .iter_dicts(max_pages: int = None, max_rows: int = None)
+    .pages(max_pages: int = None, max_items: int = None)
 
 ```python
-from tapi_yandex_metrika import YandexMetrikaStats
+from aiotapioca_yandex_metrika import YandexMetrikaStats
 
 async with YandexMetrikaStats(access_token=...) as client:
 
@@ -122,49 +106,41 @@ async with YandexMetrikaStats(access_token=...) as client:
 
     print("iteration report rows with limit")
     async for page in report().pages(max_pages=2):
-        for values in page().values(max_rows=2):
+        for values in page().to_values():
             print(values)
     # ['2020-10-01', 14234.0]
     # ['2020-10-02', 12508.0]
     # ['2020-10-06', 12795.0]
-
-
-    print("Will iterate over all lines of all pages with limit")
-    async for values in report().iter_values(max_pages=2, max_rows=1):
-        print(values)
-    # ['2020-10-01', 14234.0]
 ```
 
 ## Response
 ```python
-from tapi_yandex_metrika import YandexMetrikaStats
+from aiotapioca_yandex_metrika import YandexMetrikaStats
 
 async with YandexMetrikaStats(access_token=...) as client:
 
     report = await client.stats().get(params=...)
 
-    print(report.response)
-    print(report.response.status)
-    print(report.response.headers)
+    executor = report()
+    print(executor.data)
+    print(executor.response)
+    print(executor.response.status)
+    print(executor.response.headers)
 
     async for page in report().pages():
-        print(page.response)
-        print(page.response.status)
-        print(page.response.headers)
+        executor = page()
+        print(executor.data)
+        print(executor.response)
+        print(executor.response.status)
+        print(executor.response.headers)
 ```
 
 
-## AUTHORS
-Pavel Maksimov -
-[Telegram](https://t.me/pavel_maksimow),
-[Facebook](https://www.facebook.com/pavel.maksimow)
-
-Good luck friend! Put an asterisk;)
-
-Удачи тебе, друг! Поставь звездочку ;)
-
-
 ## CHANGELOG
+
+### Release 2022.3.23
+- The library is now asynchronous, based on aiotapioca-wrapper
+
 ### Release 2021.5.28
 - Add stub file (syntax highlighting)
 
@@ -176,7 +152,6 @@ Good luck friend! Put an asterisk;)
 - add iteration method "dicts"
 - add method "to_dicts"
 - rename parameter max_items to max_rows in iter_rows
-
 
 
 ### Release 2021.2.21

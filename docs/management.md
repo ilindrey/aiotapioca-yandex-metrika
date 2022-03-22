@@ -4,7 +4,7 @@
 
 
 ```python
-from tapi_yandex_metrika import YandexMetrikaManagement
+from aiotapioca_yandex_metrika import YandexMetrikaManagement
 
 ACCESS_TOKEN = ""
 COUNTER_ID = ""
@@ -27,15 +27,6 @@ print(dir(client))
  'set_counter_label', 'user_params_upload', 'user_params_uploading', 'user_params_uploading_confirm',
  'user_params_uploadings', 'yclid_conversions_upload', 'yclid_conversions_uploading',
  'yclid_conversions_uploadings']
-
-# Help information about the method
-client.counters().help()
-# Documentation: https://yandex.com/dev/metrika/doc/api2/management/direct_clients/getclients-docpage/
-# Resource path: management/v1/clients
-# Available HTTP methods:
-# ['GET']
-# Available query parameters:
-# 'counters=<list>'
 
 # Open resource documentation in a browser
 client.counters().open_docs()
@@ -61,17 +52,17 @@ await client.counters().options(data: dict = None, params: dict = None)
 ```
 
 ```python
-from tapi_yandex_metrika import YandexMetrikaManagement
+from aiotapioca_yandex_metrika import YandexMetrikaManagement
 
 async with YandexMetrikaManagement(...) as client:
 
     # Get counters. Via HTTP GET method.
     counters = await client.counters().get()
-    print(counters.data)
+    print(counters().data)
 
     # Get counters sorted by visit. Via HTTP GET method.
     counters = await client.counters().get(params={"sort": "Visits"})
-    print(counters.data)
+    print(counters().data)
 
     # Create a goal. Via HTTP POST method.
     body = {
@@ -124,27 +115,20 @@ async with YandexMetrikaManagement(...) as client:
 You can get information about the request.
 ```python
 counters = await client.counters().get()
-print(counters.response)
-print(counters.response.headers)
-print(counters.status)
+executor = counters()
+print(executor.data)
+print(executor.response)
+print(executor.response.headers)
+print(executor.status)
 ```
 
-
-## Authors
-Pavel Maksimov -
-[Telegram](https://t.me/pavel_maksimow),
-[Facebook](https://www.facebook.com/pavel.maksimow)
-
-Good luck friend! Put an asterisk;)
-
-Удачи тебе, друг! Поставь звездочку ;)
-
-Copyright (c) Pavel Maksimov.
-
 ## CHANGELOG
+
+### Release 2022.3.23
+- The library is now asynchronous, based on aiotapioca-wrapper
+
 ### Release 2021.5.28
 - Add stub file (syntax highlighting)
-
 
 ### Release 2021.2.21
 
