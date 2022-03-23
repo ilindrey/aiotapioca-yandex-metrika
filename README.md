@@ -36,4 +36,4 @@ Good luck friend! Put an asterisk;)
 
 Copyright (c) Pavel Maksimov.
 
-The author of this modification Andrey Ilin
+The author of this modification Andrey Ilin.
