@@ -1,4 +1,4 @@
-import json
+import orjson
 from aioresponses import aioresponses
 
 from aiotapioca_yandex_metrika import YandexMetrikaStats
@@ -34,7 +34,7 @@ async def test_stats_data():
 
             response = await client.stats().get(params=url_params)
 
-            assert response().data == json.loads(REPORTS_DATA)
+            assert response().data == orjson.loads(REPORTS_DATA)
             assert response.query.ids().data == [100500]
             assert response.query.limit().data == 1
             assert len(response.data().data) > 0
@@ -54,7 +54,7 @@ async def test_transform():
 
             response = await client.stats().get(params=url_params)
 
-            response_data = json.loads(REPORTS_DATA)
+            response_data = orjson.loads(REPORTS_DATA)
 
             assert response().data == response_data
             assert response().to_headers() == ["ym:s:date", "ym:s:visits"]
@@ -80,7 +80,7 @@ async def test_transform():
 
 
 async def test_iteration():
-    response_data = json.loads(REPORTS_DATA)
+    response_data = orjson.loads(REPORTS_DATA)
     async with YandexMetrikaStats(**default_params) as client:
         url_1 = make_url(client.stats().data, url_params)
 

@@ -1,4 +1,4 @@
-import json
+import orjson
 from io import StringIO
 from aioresponses import aioresponses
 
@@ -37,7 +37,7 @@ async def test_create():
             }
             mocked.post(
                 make_url(client.create().data, url_params),
-                body=json.dumps(response_data, default=str),
+                body=orjson.dumps(response_data, default=str),
                 status=200,
                 content_type="application/json",
             )
@@ -84,7 +84,7 @@ async def test_get_allinfo():
 
             mocked.get(
                 client.allinfo().data,
-                body=json.dumps(response_data, default=str),
+                body=orjson.dumps(response_data, default=str),
                 status=200,
                 content_type="application/json",
             )

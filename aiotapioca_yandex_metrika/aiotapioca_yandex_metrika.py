@@ -1,9 +1,8 @@
-import json
+import orjson
 import logging
 import random
 import re
 import time
-from aiohttp.client_exceptions import ContentTypeError
 
 from aiotapioca import TapiocaAdapter, JSONAdapterMixin, generate_wrapper_from_adapter
 from aiotapioca.exceptions import ResponseProcessException
@@ -142,16 +141,15 @@ class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
     serializer_class = LogsAPISerializer
 
     async def response_to_native(self, response, **kwargs):
+        text = await response.text()
+
+        if not text:
+            return None
+
         try:
-            return await response.json()
-        except ContentTypeError:
-            text = await response.text()
-            try:
-                return json.loads(text)
-            except json.JSONDecodeError:
-                return text
-        except json.JSONDecodeError:
-            return await response.text()
+            return orjson.loads(text)
+        except orjson.JSONDecodeError:
+            return text
 
     def error_handling(
         self,
