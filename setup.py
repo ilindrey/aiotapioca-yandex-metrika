@@ -13,6 +13,17 @@ with open("README.md", "r", encoding="utf8") as fh:
 
 package = "aiotapioca_yandex_metrika"
 
+requirements = ["aiohttp>=3.0", "aiotapioca-wrapper>=3.5.0", "orjson>=3.0.0"]
+test_requirements = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.18",
+    "aioresponses>=0.7",
+]
+dev_requirements = [
+    *test_requirements,
+    "black>=22.0",
+]
+
 
 def get_version(package):
     """
@@ -32,23 +43,16 @@ setup(
     long_description_content_type="text/markdown",
     author="Pavel Maksimov",
     author_email="vur21@ya.ru",
-    url="https://github.com/ilindrey/async-tapi-yandex-metrika",
+    url="https://github.com/ilindrey/aiotapioca-yandex-metrika",
     packages=[package],
+    package_dir={package: package},
     include_package_data=False,
-    install_requires=["aiohttp>=3.0", "aiotapioca-wrapper>=3.5.0", "orjson>=3.0.0"],
-    extras_require={
-        "dev": [
-            "black>=22.0",
-            "pytest>=7.0",
-            "pytest-asyncio>=0.18",
-            "aioresponses>=0.7",
-        ]
-    },
     license="MIT",
     zip_safe=False,
-    keywords="tapi,wrapper,yandex,metrika,api,async",
+    keywords="aiotapioca,wrapper,yandex,metrika,api,async,asyncio",
+    python_requires=">=3.6",
+    install_requires=requirements,
     test_suite="tests",
-    package_data={
-        package: ["*"],
-    },
+    tests_require=test_requirements,
+    extras_require={"dev": dev_requirements},
 )

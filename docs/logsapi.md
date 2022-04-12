@@ -216,7 +216,10 @@ And evaluate method only with GET method
 
 
 ## CHANGELOG
-### Release 2022.3.23
+### Release 2022.4.13
+- Changes related to the original library [commit](https://github.com/pavelmaksimov/tapi-yandex-metrika/commit/db8e6b09643e553bce865e8ee4199c0756635f9c). Stop waiting a report if the report status is invalid by raising an error
+
+### Release 2022.3.26
 - The library is now asynchronous, based on aiotapioca-wrapper
 
 ### Release 2021.5.28

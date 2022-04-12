@@ -124,7 +124,7 @@ print(executor.status)
 
 ## CHANGELOG
 
-### Release 2022.3.23
+### Release 2022.3.26
 - The library is now asynchronous, based on aiotapioca-wrapper
 
 ### Release 2021.5.28

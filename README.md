@@ -1,6 +1,6 @@
 # Python client for all [API Yandex Metrika](https://yandex.com/dev/metrika/doc/api2/concept/about-docpage/)
 
-![Supported Python Versions](https://img.shields.io/static/v1?label=python&message=>=3.5&color=red)
+![Supported Python Versions](https://img.shields.io/static/v1?label=python&message=>=3.6&color=red)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/ilindrey/aiotapioca-yandex-metrikar/master/LICENSE)
 [![Codestyle](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
