@@ -1,3 +1,4 @@
+import asyncio
 import orjson
 import logging
 import random
@@ -57,7 +58,7 @@ class YandexMetrikaClientAdapterAbstract(JSONAdapterMixin, TapiocaAdapter):
         response,
         request_kwargs,
         api_params,
-        **kwargs
+        **kwargs,
     ):
         code = int(error_message.get("code", 0))
         message = error_message.get("message", "")
@@ -115,7 +116,7 @@ class YandexMetrikaClientAdapterAbstract(JSONAdapterMixin, TapiocaAdapter):
         response,
         request_kwargs,
         api_params,
-        **kwargs
+        **kwargs,
     ):
         if "error_text" in error_message:
             raise exceptions.YandexMetrikaApiError(
@@ -159,7 +160,7 @@ class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
         response,
         request_kwargs,
         api_params,
-        **kwargs
+        **kwargs,
     ):
         message = error_message.get("message")
         if message == "Incorrect part number":
@@ -176,22 +177,21 @@ class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
             response,
             request_kwargs,
             api_params,
-            **kwargs
+            **kwargs,
         )
 
-    def _is_exists_report(self, response, api_params, **kwargs):
-        request_id = api_params["default_url_params"]["requestId"]
-        if kwargs["store"].get(request_id) is None:
+    @staticmethod
+    async def _check_status_report(response, api_params, **kwargs):
+        request_id = api_params["default_url_params"].get("requestId")
+        if request_id is None:
             client = kwargs["client"]
-            info = client.info(requestId=request_id).get()
-            status = info.data["log_request"]["status"]
-            if "cleaned" in status:
+            info = await client.info(requestId=request_id).get()
+            status = info().data["log_request"]["status"]
+            if status not in ("processed", "created"):
                 raise exceptions.YandexMetrikaDownloadReportError(
                     response,
-                    message="The report does not exist, it has been cleared. "
-                    "Current report status is '{}'".format(status),
+                    message=f"Such status '{status}' of the report does not allow downloading it",
                 )
-            kwargs["store"][request_id] = "exists"
 
     def retry_request(
         self,
@@ -201,7 +201,7 @@ class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
         response,
         request_kwargs,
         api_params,
-        **kwargs
+        **kwargs,
     ):
         """
         Conditions for repeating a request. If it returns True, the request will be repeated.
@@ -213,13 +213,13 @@ class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
             and "download" in request_kwargs["url"]
             and api_params.get("wait_report", False)
         ):
-            self._is_exists_report(response, api_params, **kwargs)
+            asyncio.run(self._check_status_report(response, api_params, **kwargs))
 
             # The error appears when trying to download an unprepared report.
             max_sleep = 60 * 5
             sleep_time = repeat_number * 60
             sleep_time = sleep_time if sleep_time <= max_sleep else max_sleep
-            logger.info("Wait report {} sec.".format(sleep_time))
+            logger.info("Wait report %s sec.", sleep_time)
             time.sleep(sleep_time)
 
             return True
@@ -231,7 +231,7 @@ class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
             response,
             request_kwargs,
             api_params,
-            **kwargs
+            **kwargs,
         )
 
     def fill_resource_template_url(self, template, url_params, **kwargs):
