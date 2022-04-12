@@ -25,7 +25,7 @@ STATS_RESOURCE_MAPPING = {
     },
 }
 
-LOGSAPI_RESOURCE_MAPPING = {
+LOGS_API_RESOURCE_MAPPING = {
     "all_info": {
         "resource": "management/v1/counter/{counterId}/logrequests",
         "docs": "https://yandex.com/dev/metrika/doc/api2/logs/queries/getlogrequests-docpage/",
@@ -74,18 +74,20 @@ MANAGEMENT_RESOURCE_MAPPING = {
     "counters": {
         "resource": "management/v1/counters",
         "docs": "https://yandex.com/dev/metrika/doc/api2/management/counters/counters-docpage/",
-        "params": """[callback=<string>]
- & [favorite=<boolean>]
- & [field=<string>]
- & [label_id=<integer>]
- & [offset=<int>]
- & [per_page=<int>]
- & [permission=<string>]
- & [reverse=<boolean>]
- & [search_string=<string>]
- & [sort=<counters_sort>]
- & [status=<counter_status>]
- & [type=<counter_type>]""",
+        "params": """
+                [callback=<string>]
+                & [favorite=<boolean>]
+                & [field=<string>]
+                & [label_id=<integer>]
+                & [offset=<int>]
+                & [per_page=<int>]
+                & [permission=<string>]
+                & [reverse=<boolean>]
+                & [search_string=<string>]
+                & [sort=<counters_sort>]
+                & [status=<counter_status>]
+                & [type=<counter_type>]
+                """,
         "methods": ["GET", "POST"],
         "response_data_key": "counters",
     },
@@ -301,9 +303,11 @@ MANAGEMENT_RESOURCE_MAPPING = {
     "offline_conversions_upload_calls": {
         "resource": "management/v1/counter/{counterId}/offline_conversions/upload_calls",
         "docs": "https://yandex.com/dev/metrika/doc/api2/management/offline_conversion/uploadcalls-docpage/",
-        "params": """client_id_type=<offline_conversion_uploading_client_id_type>
- & [comment=<string>]
- & [new_goal_name=<string>]""",
+        "params": """
+                client_id_type=<offline_conversion_uploading_client_id_type>
+                & [comment=<string>]
+                & [new_goal_name=<string>]
+                """,
         "methods": ["POST"],
     },
     "offline_conversions_extended_threshold": {

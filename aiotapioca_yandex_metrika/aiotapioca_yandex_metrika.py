@@ -10,7 +10,7 @@ from aiotapioca.exceptions import ResponseProcessException
 from . import exceptions
 from .resource_mapping import (
     STATS_RESOURCE_MAPPING,
-    LOGSAPI_RESOURCE_MAPPING,
+    LOGS_API_RESOURCE_MAPPING,
     MANAGEMENT_RESOURCE_MAPPING,
 )
 from .serializers import StatsSerializer, LogsAPISerializer
@@ -137,7 +137,7 @@ class YandexMetrikaManagementClientAdapter(YandexMetrikaClientAdapterAbstract):
 
 
 class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
-    resource_mapping = LOGSAPI_RESOURCE_MAPPING
+    resource_mapping = LOGS_API_RESOURCE_MAPPING
     serializer_class = LogsAPISerializer
 
     async def response_to_native(self, response, **kwargs):
