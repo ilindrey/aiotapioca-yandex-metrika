@@ -26,7 +26,7 @@ STATS_RESOURCE_MAPPING = {
 }
 
 LOGSAPI_RESOURCE_MAPPING = {
-    "allinfo": {
+    "all_info": {
         "resource": "management/v1/counter/{counterId}/logrequests",
         "docs": "https://yandex.com/dev/metrika/doc/api2/logs/queries/getlogrequests-docpage/",
         "params": None,
