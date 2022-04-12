@@ -199,9 +199,9 @@ REPORTS_DATA = json.dumps(
 )
 
 LOGS_DATA = (
-    "col1\tcol2\n"
-    "val1\tval2\n"
-    "val11\tval22\n"
-    "val111\tval222\n"
-    "val1111\tval2222\n"
+    "col1\tcol2\tcol3\tcol4\tcol5\n"
+    "val1\tval2\tval3\tval4\tval5\n"
+    "val11\tval22\tval33\tval44\tval55\n"
+    "val111\tval222\tval333\tval444\tval555\n"
+    "val1111\tval2222\tval3333\tval4444\tval5555\n"
 )
