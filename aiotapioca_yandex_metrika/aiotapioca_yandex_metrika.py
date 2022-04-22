@@ -22,14 +22,15 @@ LIMIT = 10000
 
 
 class YandexMetrikaClientAdapterAbstract(JSONAdapterMixin, TapiocaAdapter):
-    def get_api_root(self, api_params, resource_name):
+    def get_api_root(self, api_params, **kwargs):
         return "https://api-metrika.yandex.net/"
 
-    def get_request_kwargs(self, api_params, *args, **kwargs):
+    def get_request_kwargs(self, *args, **kwargs):
+        api_params = kwargs.get("api_params", {})
         if "receive_all_data" in api_params:
             raise exceptions.BackwardCompatibilityError("parameter 'receive_all_data'")
 
-        arguments = super().get_request_kwargs(api_params, *args, **kwargs)
+        arguments = super().get_request_kwargs(*args, **kwargs)
         arguments["headers"]["Authorization"] = "OAuth {}".format(
             api_params["access_token"]
         )
@@ -41,7 +42,7 @@ class YandexMetrikaClientAdapterAbstract(JSONAdapterMixin, TapiocaAdapter):
         else:
             return data
 
-    def format_data_to_request(self, data):
+    def format_data_to_request(self, data, **kwargs):
         return data
 
     async def process_response(self, response, **kwargs):
@@ -180,8 +181,7 @@ class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
             **kwargs,
         )
 
-    @staticmethod
-    async def _check_status_report(response, api_params, **kwargs):
+    async def _check_status_report(self, response, api_params, **kwargs):
         request_id = api_params["default_url_params"].get("requestId")
         if request_id is None:
             client = kwargs["client"]
