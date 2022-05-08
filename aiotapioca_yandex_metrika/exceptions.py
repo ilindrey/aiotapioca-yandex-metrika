@@ -7,7 +7,7 @@ class YandexMetrikaApiError(Exception):
         return "{} {} {}\nHEADERS = {}\nURL = {}".format(
             self.response.status,
             self.response.reason,
-            self.message or self.response.text,
+            self.message,
             self.response.headers,
             self.response.url,
         )
@@ -24,6 +24,10 @@ class YandexMetrikaClientError(YandexMetrikaApiError):
         return "code={}, message={}, errors={}".format(
             self.code, self.message, self.errors
         )
+
+
+class YandexMetrikaServerError(YandexMetrikaClientError):
+    pass
 
 
 class YandexMetrikaTokenError(YandexMetrikaClientError):
