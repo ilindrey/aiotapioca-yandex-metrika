@@ -1,14 +1,27 @@
-import asyncio
 import orjson
 import logging
 import random
 import re
 import time
+from asyncio import run as asyncio_run
+from inspect import isclass
 
-from aiotapioca import TapiocaAdapter, JSONAdapterMixin, generate_wrapper_from_adapter
+from aiotapioca.adapters import (
+    TapiocaAdapter,
+    JSONAdapterMixin,
+    generate_wrapper_from_adapter,
+)
 from aiotapioca.exceptions import ResponseProcessException
 
-from . import exceptions
+from .exceptions import (
+    YandexMetrikaApiError,
+    YandexMetrikaClientError,
+    YandexMetrikaServerError,
+    YandexMetrikaTokenError,
+    YandexMetrikaLimitError,
+    YandexMetrikaDownloadReportError,
+    BackwardCompatibilityError,
+)
 from .resource_mapping import (
     STATS_RESOURCE_MAPPING,
     LOGS_API_RESOURCE_MAPPING,
@@ -28,7 +41,7 @@ class YandexMetrikaClientAdapterAbstract(JSONAdapterMixin, TapiocaAdapter):
     def get_request_kwargs(self, *args, **kwargs):
         api_params = kwargs.get("api_params", {})
         if "receive_all_data" in api_params:
-            raise exceptions.BackwardCompatibilityError("parameter 'receive_all_data'")
+            raise BackwardCompatibilityError("parameter 'receive_all_data'")
 
         arguments = super().get_request_kwargs(*args, **kwargs)
         arguments["headers"]["Authorization"] = "OAuth {}".format(
@@ -42,26 +55,30 @@ class YandexMetrikaClientAdapterAbstract(JSONAdapterMixin, TapiocaAdapter):
         else:
             return data
 
-    def format_data_to_request(self, data, **kwargs):
-        return data
-
     async def process_response(self, response, **kwargs):
-        data = await super().process_response(response, **kwargs)
-        if isinstance(data, dict) and "errors" in data:
-            raise ResponseProcessException(response, data)
+        data = await self.response_to_native(response, **kwargs)
+        if response.status == 403:
+            raise ResponseProcessException(YandexMetrikaTokenError, data)
+        elif response.status == 429:
+            raise ResponseProcessException(YandexMetrikaLimitError, data)
+        elif 400 <= response.status < 500:
+            raise ResponseProcessException(YandexMetrikaClientError, data)
+        elif 500 <= response.status < 600:
+            raise ResponseProcessException(YandexMetrikaServerError, data)
         return data
 
     def retry_request(
         self,
-        tapi_exception,
-        error_message,
-        repeat_number,
-        response,
-        request_kwargs,
-        api_params,
+        exception=None,
+        error_message=None,
+        repeat_number=0,
         **kwargs,
     ):
-        code = int(error_message.get("code", 0))
+        api_params = kwargs["api_params"]
+        response = kwargs["response"]
+        error_message = error_message if error_message else {}
+
+        code = response.status if response else int(error_message.get("code", 0))
         message = error_message.get("message", "")
         errors_types = [i.get("error_type") for i in error_message.get("errors", [])]
 
@@ -111,27 +128,19 @@ class YandexMetrikaClientAdapterAbstract(JSONAdapterMixin, TapiocaAdapter):
 
     def error_handling(
         self,
-        tapi_exception,
-        error_message,
-        repeat_number,
-        response,
-        request_kwargs,
-        api_params,
+        exception=None,
+        error_message=None,
+        repeat_number=0,
         **kwargs,
     ):
-        if "error_text" in error_message:
-            raise exceptions.YandexMetrikaApiError(
-                response, error_message["error_text"]
-            )
-        else:
-            error_code = int(error_message.get("code", 0))
-
-            if error_code == 429:
-                raise exceptions.YandexMetrikaLimitError(response, **error_message)
-            elif error_code == 403:
-                raise exceptions.YandexMetrikaTokenError(response, **error_message)
+        if isclass(exception) and issubclass(exception, YandexMetrikaApiError):
+            response = kwargs["response"]
+            if "error_text" in error_message:
+                raise YandexMetrikaApiError(response, error_message["error_text"])
             else:
-                raise exceptions.YandexMetrikaClientError(response, **error_message)
+                raise exception(response, **error_message)
+        else:
+            super().error_handling(exception, error_message, repeat_number, **kwargs)
 
 
 class YandexMetrikaManagementClientAdapter(YandexMetrikaClientAdapterAbstract):
@@ -152,87 +161,6 @@ class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
             return orjson.loads(text)
         except orjson.JSONDecodeError:
             return text
-
-    def error_handling(
-        self,
-        tapi_exception,
-        error_message,
-        repeat_number,
-        response,
-        request_kwargs,
-        api_params,
-        **kwargs,
-    ):
-        message = error_message.get("message")
-        if message == "Incorrect part number":
-            # Fires when trying to download a non-existent part of a report.
-            return
-
-        if message == "Only log of requests in status 'processed' can be downloaded":
-            raise exceptions.YandexMetrikaDownloadReportError(response)
-
-        return super().error_handling(
-            tapi_exception,
-            error_message,
-            repeat_number,
-            response,
-            request_kwargs,
-            api_params,
-            **kwargs,
-        )
-
-    async def _check_status_report(self, response, api_params, **kwargs):
-        request_id = api_params["default_url_params"].get("requestId")
-        if request_id is None:
-            client = kwargs["client"]
-            info = await client.info(requestId=request_id).get()
-            status = info().data["log_request"]["status"]
-            if status not in ("processed", "created"):
-                raise exceptions.YandexMetrikaDownloadReportError(
-                    response,
-                    message=f"Such status '{status}' of the report does not allow downloading it",
-                )
-
-    def retry_request(
-        self,
-        tapi_exception,
-        error_message,
-        repeat_number,
-        response,
-        request_kwargs,
-        api_params,
-        **kwargs,
-    ):
-        """
-        Conditions for repeating a request. If it returns True, the request will be repeated.
-        """
-        message = error_message.get("message")
-
-        if (
-            message == "Only log of requests in status 'processed' can be downloaded"
-            and "download" in request_kwargs["url"]
-            and api_params.get("wait_report", False)
-        ):
-            asyncio.run(self._check_status_report(response, api_params, **kwargs))
-
-            # The error appears when trying to download an unprepared report.
-            max_sleep = 60 * 5
-            sleep_time = repeat_number * 60
-            sleep_time = sleep_time if sleep_time <= max_sleep else max_sleep
-            logger.info("Wait report %s sec.", sleep_time)
-            time.sleep(sleep_time)
-
-            return True
-
-        return super().retry_request(
-            tapi_exception,
-            error_message,
-            repeat_number,
-            response,
-            request_kwargs,
-            api_params,
-            **kwargs,
-        )
 
     def fill_resource_template_url(self, template, url_params, **kwargs):
         resource = kwargs.get("resource")
@@ -258,6 +186,78 @@ class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
             return [data]
         else:
             return []
+
+    async def _check_status_report(self, response, api_params, **kwargs):
+        request_id = api_params["default_url_params"].get("requestId")
+        if request_id is None:
+            client = kwargs["client"]
+            info = await client.info(requestId=request_id).get()
+            status = info().data["log_request"]["status"]
+            if status not in ("processed", "created"):
+                raise YandexMetrikaDownloadReportError(
+                    response,
+                    message=f"Such status '{status}' of the report does not allow downloading it",
+                )
+
+    def retry_request(
+        self,
+        exception=None,
+        error_message=None,
+        repeat_number=0,
+        **kwargs,
+    ):
+        """
+        Conditions for repeating a request. If it returns True, the request will be repeated.
+        """
+        response = kwargs["response"]
+        request_kwargs = kwargs["request_kwargs"]
+        api_params = kwargs["api_params"]
+        message = error_message.get("message")
+
+        if (
+            message == "Only log of requests in status 'processed' can be downloaded"
+            and "download" in request_kwargs["url"]
+            and api_params.get("wait_report", False)
+        ):
+            asyncio_run(self._check_status_report(response, api_params, **kwargs))
+
+            # The error appears when trying to download an unprepared report.
+            max_sleep = 60 * 5
+            sleep_time = repeat_number * 60
+            sleep_time = sleep_time if sleep_time <= max_sleep else max_sleep
+            logger.info("Wait report %s sec.", sleep_time)
+            time.sleep(sleep_time)
+
+            return True
+
+        return super().retry_request(
+            exception,
+            error_message,
+            repeat_number,
+            **kwargs,
+        )
+
+    def error_handling(
+        self,
+        exception=None,
+        error_message=None,
+        repeat_number=0,
+        **kwargs,
+    ):
+        message = error_message.get("message")
+        if message == "Incorrect part number":
+            # Fires when trying to download a non-existent part of a report.
+            return
+
+        if message == "Only log of requests in status 'processed' can be downloaded":
+            raise YandexMetrikaDownloadReportError(kwargs["response"])
+
+        return super().error_handling(
+            exception,
+            error_message,
+            repeat_number,
+            **kwargs,
+        )
 
 
 class YandexMetrikaStatsClientAdapter(YandexMetrikaClientAdapterAbstract):

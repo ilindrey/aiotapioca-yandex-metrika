@@ -7,7 +7,7 @@ class YandexMetrikaApiError(Exception):
         return "{} {} {}\nHEADERS = {}\nURL = {}".format(
             self.response.status,
             self.response.reason,
-            self.message,
+            self.message or "",
             self.response.headers,
             self.response.url,
         )
