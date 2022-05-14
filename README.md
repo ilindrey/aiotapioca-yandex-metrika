@@ -4,7 +4,7 @@
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/ilindrey/aiotapioca-yandex-metrikar/master/LICENSE)
 [![Codestyle](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-It's an asynchronous fork of [tapi-yandex-metrica](https://github.com/pavelmaksimov/tapi-yandex-metrika) library.
+It's an asynchronous fork of [tapi-yandex-metrika](https://github.com/pavelmaksimov/tapi-yandex-metrika) library.
 
 ## Installation
 
@@ -12,11 +12,11 @@ It's an asynchronous fork of [tapi-yandex-metrica](https://github.com/pavelmaksi
 
 ## Documentation
 
-[API Management](https://github.com/ilindrey/aiotapioca-yandex-metrika/blob/master/docs/management.md)
+[Management API](docs/management_api.md)
 
-[API Stats](https://github.com/ilindrey/aiotapioca-yandex-metrika/blob/master/docs/stats.md)
+[Reports API](docs/reports_api.md)
 
-[Logs API](https://github.com/ilindrey/aiotapioca-yandex-metrika/blob/master/docs/logsapi.md)
+[Logs API](docs/logs_api.md)
 
 ## Dependencies
 - [aiohttp](https://docs.aiohttp.org/en/stable/)
