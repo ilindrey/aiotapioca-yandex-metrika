@@ -36,45 +36,41 @@
 
 ### Management API
 
-**New Feature**
-- add attribut "data"
-- add attribut "response"
+- New feature:
+  - add attribut "data"
+  - add attribut "response"
 
 ### Reports API
 
-**Backward Incompatible Change**
-
-- Drop method "transform"
-- Drop param "receive_all_data"
-
-**New Feature**
-- translated into english
-- add iteration method "pages"
-- add iteration method "rows"
-- add iteration method "iter_rows"
-- add attribut "columns"
-- add attribut "data"
-- add attribut "response"
-- add method "to_values"
-- add method "to_columns"
+- Backward incompatible change:
+  - drop method "transform"
+  - drop param "receive_all_data"
+- New feature:
+  - translated into english
+  - add iteration method "pages"
+  - add iteration method "rows"
+  - add iteration method "iter_rows"
+  - add attribut "columns"
+  - add attribut "data"
+  - add attribut "response"
+  - add method "to_values"
+  - add method "to_columns"
 
 ### Logs API
 
-**Backward Incompatible Change**
-
-- Drop method "transform"
-- Drop param "receive_all_data"
-
-**New Feature**
-- translated into english
-- add iteration method "parts"
-- add iteration method "lines"
-- add iteration method "values"
-- add iteration method "iter_lines"
-- add iteration method "iter_values"
-- add attribut "columns"
-- add attribut "data"
-- add attribut "response"
-- add method "to_lines"
-- add method "to_values"
-- add method "to_columns"
+- Backward incompatible change:
+  - drop method "transform"
+  - drop param "receive_all_data"
+- New feature:
+  - translated into english
+  - add iteration method "parts"
+  - add iteration method "lines"
+  - add iteration method "values"
+  - add iteration method "iter_lines"
+  - add iteration method "iter_values"
+  - add attribut "columns"
+  - add attribut "data"
+  - add attribut "response"
+  - add method "to_lines"
+  - add method "to_values"
+  - add method "to_columns"

@@ -3,7 +3,7 @@
 [Official documentation API Yandex Metrika](https://yandex.com/dev/metrika/doc/api2/api_v1/data.html)
 
 ```python
-import datetime as dt
+from datetime import date
 from aiotapioca_yandex_metrika import YandexMetrikaReportsAPI
 
 ACCESS_TOKEN = ""
@@ -14,7 +14,7 @@ async with YandexMetrikaReportsAPI(access_token=ACCESS_TOKEN) as client:
     params = dict(
         ids=COUNTER_ID,
         date1="2020-10-01",
-        date2=dt.date(2020,10,5),
+        date2=date(2020,10,5),
         metrics="ym:s:visits",
         dimensions="ym:s:date",
         sort="ym:s:date",
