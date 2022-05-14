@@ -1,8 +1,8 @@
 from io import StringIO
 
-import orjson
 import pytest
 import pytest_asyncio
+from orjson import dumps
 from response_data import LOGS_DATA
 from utils import make_url
 
@@ -74,7 +74,7 @@ async def test_all_info(mocked, client, url_params_visits, url_params_hits):
 
     mocked.get(
         client.all_info().data,
-        body=orjson.dumps(response_data),
+        body=dumps(response_data),
         status=200,
         content_type="application/json",
     )
@@ -95,7 +95,7 @@ async def test_evaluate(mocked, client, url_params_visits):
 
     mocked.get(
         make_url(client.evaluate().data, url_params_visits),
-        body=orjson.dumps(response_data),
+        body=dumps(response_data),
         status=200,
         content_type="application/json",
     )
@@ -122,7 +122,7 @@ async def test_create(mocked, client, url_params_visits):
     }
     mocked.post(
         make_url(client.create().data, url_params_visits),
-        body=orjson.dumps(response_data),
+        body=dumps(response_data),
         status=200,
         content_type="application/json",
     )
@@ -152,7 +152,7 @@ async def test_info(mocked, client, url_params_visits):
     }
     mocked.get(
         client.info(requestId=12345678).data,
-        body=orjson.dumps(response_data),
+        body=dumps(response_data),
         status=200,
         content_type="application/json",
     )
@@ -193,7 +193,7 @@ async def test_clean(mocked, client, url_params_visits):
     }
     mocked.post(
         client.clean(requestId=12345678).data,
-        body=orjson.dumps(response_data),
+        body=dumps(response_data),
         status=200,
         content_type="application/json",
     )
@@ -222,7 +222,7 @@ async def test_cancel(mocked, client, url_params_visits):
     }
     mocked.post(
         client.cancel(requestId=12345678).data,
-        body=orjson.dumps(response_data),
+        body=dumps(response_data),
         status=200,
         content_type="application/json",
     )

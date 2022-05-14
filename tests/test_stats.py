@@ -1,5 +1,7 @@
-import orjson
+from datetime import date
+
 import pytest_asyncio
+from orjson import loads
 from response_data import REPORTS_DATA
 from utils import make_url
 
@@ -12,8 +14,8 @@ url_params = dict(
     sort="ym:s:date",
     filters="ym:s:startURL=.('https://rfgf.ru/map','https://rfgf.ru/map')",
     group="Day",
-    date1="2020-10-01",
-    date2="2020-10-05",
+    date1=date(2022, 10, 1),
+    date2=date(2022, 10, 5),
     limit=1,
 )
 
@@ -34,7 +36,7 @@ async def test_stats_data(mocked, client):
 
     response = await client.stats().get(params=url_params)
 
-    assert response().data == orjson.loads(REPORTS_DATA)
+    assert response().data == loads(REPORTS_DATA)
     assert response.query.ids().data == [100500]
     assert response.query.limit().data == 1
     assert len(response.data().data) > 0
@@ -52,7 +54,7 @@ async def test_transform(mocked, client):
 
     response = await client.stats().get(params=url_params)
 
-    response_data = orjson.loads(REPORTS_DATA)
+    response_data = loads(REPORTS_DATA)
 
     assert response().data == response_data
     assert response().to_headers() == ["ym:s:date", "ym:s:visits"]
@@ -79,7 +81,7 @@ async def test_transform(mocked, client):
 
 async def test_iteration(mocked, client):
 
-    response_data = orjson.loads(REPORTS_DATA)
+    response_data = loads(REPORTS_DATA)
 
     url_1 = make_url(client.stats().data, url_params)
 

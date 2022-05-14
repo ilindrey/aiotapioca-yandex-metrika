@@ -1,6 +1,7 @@
 import re
 import time
 from asyncio import run as asyncio_run
+from datetime import date
 from inspect import isclass
 from logging import getLogger
 from random import randint
@@ -263,6 +264,29 @@ class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
 class YandexMetrikaStatsClientAdapter(YandexMetrikaClientAdapterAbstract):
     resource_mapping = STATS_RESOURCE_MAPPING
     serializer_class = StatsSerializer
+
+    @staticmethod
+    def _convert_date_to_str_format(dt):
+        if isinstance(dt, date):
+            return dt.strftime("%Y-%m-%d")
+        elif isinstance(dt, str):
+            return dt
+        else:
+            raise TypeError(
+                'Parameters "date1" and "date2" must be of the datetime, date or string type.'
+            )
+
+    def get_request_kwargs(self, *args, **kwargs):
+        arguments = super().get_request_kwargs(*args, **kwargs)
+
+        params = arguments.get("params")
+        if params:
+            params["date1"] = self._convert_date_to_str_format(params.get("date1"))
+            params["date2"] = self._convert_date_to_str_format(params.get("date2"))
+
+        arguments["params"] = params
+
+        return arguments
 
     async def process_response(self, response, **kwargs):
         data = await super().process_response(response, **kwargs)
