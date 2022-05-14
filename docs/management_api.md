@@ -121,17 +121,3 @@ print(executor.response)
 print(executor.response.headers)
 print(executor.status)
 ```
-
-## CHANGELOG
-
-### Release 2022.3.26
-- The library is now asynchronous, based on aiotapioca-wrapper
-
-### Release 2021.5.28
-- Add stub file (syntax highlighting)
-
-### Release 2021.2.21
-
-**New Feature**
-- add attribut "data"
-- add attribut "response"

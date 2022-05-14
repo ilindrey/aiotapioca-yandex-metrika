@@ -1,4 +1,4 @@
-# Documentation for downloading reports from API Yandex Metrika (Как скачать данные из API Яндекс Метрика)
+# Documentation for downloading reports from API Yandex Metrika.
 
 [Official documentation API Yandex Metrika](https://yandex.com/dev/metrika/doc/api2/api_v1/data.html)
 
@@ -134,43 +134,3 @@ async with YandexMetrikaStats(access_token=...) as client:
         print(executor.response.status)
         print(executor.response.headers)
 ```
-
-
-## CHANGELOG
-
-### Release 2022.3.26
-- The library is now asynchronous, based on aiotapioca-wrapper
-
-### Release 2021.5.28
-- Add stub file (syntax highlighting)
-
-
-### Release 2021.5.15
-- add iteration method "iter_values"
-- add iteration method "iter_dicts"
-- add iteration method "values"
-- add iteration method "dicts"
-- add method "to_dicts"
-- rename parameter max_items to max_rows in iter_rows
-
-
-### Release 2021.2.21
-
-**Backward Incompatible Change**
-
-- Drop method "transform"
-- Drop param "receive_all_data"
-
-**New Feature**
-- translated into english
-- add iteration method "pages"
-- add iteration method "rows"
-- add iteration method "iter_rows"
-- add attribut "columns"
-- add attribut "data"
-- add attribut "response"
-- add method "to_values"
-- add method "to_columns"
-
-\
-Copyright (c) Pavel Maksimov.
