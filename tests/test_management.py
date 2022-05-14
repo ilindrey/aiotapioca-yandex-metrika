@@ -1,7 +1,7 @@
 import pytest_asyncio
+from response_data import COUNTERS_DATA, GOAL_DATA, GOALS_DATA
 
 from aiotapioca_yandex_metrika import YandexMetrikaManagement
-from response_data import COUNTERS_DATA, GOALS_DATA, GOAL_DATA
 
 
 @pytest_asyncio.fixture

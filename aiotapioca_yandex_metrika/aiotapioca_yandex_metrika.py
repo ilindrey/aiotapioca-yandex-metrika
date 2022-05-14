@@ -1,35 +1,35 @@
-import orjson
-import logging
-import random
 import re
 import time
 from asyncio import run as asyncio_run
 from inspect import isclass
+from logging import getLogger
+from random import randint
 
 from aiotapioca.adapters import (
-    TapiocaAdapter,
     JSONAdapterMixin,
+    TapiocaAdapter,
     generate_wrapper_from_adapter,
 )
 from aiotapioca.exceptions import ResponseProcessException
+from orjson import JSONDecodeError, loads
 
 from .exceptions import (
+    BackwardCompatibilityError,
     YandexMetrikaApiError,
     YandexMetrikaClientError,
+    YandexMetrikaDownloadReportError,
+    YandexMetrikaLimitError,
     YandexMetrikaServerError,
     YandexMetrikaTokenError,
-    YandexMetrikaLimitError,
-    YandexMetrikaDownloadReportError,
-    BackwardCompatibilityError,
 )
 from .resource_mapping import (
-    STATS_RESOURCE_MAPPING,
     LOGS_API_RESOURCE_MAPPING,
     MANAGEMENT_RESOURCE_MAPPING,
+    STATS_RESOURCE_MAPPING,
 )
-from .serializers import StatsSerializer, LogsAPISerializer
+from .serializers import LogsAPISerializer, StatsSerializer
 
-logger = logging.getLogger(__name__)
+logger = getLogger(__name__)
 
 LIMIT = 10000
 
@@ -97,7 +97,7 @@ class YandexMetrikaClientAdapterAbstract(JSONAdapterMixin, TapiocaAdapter):
         if code == 400:
             if message == big_report_request:
                 if repeat_number < 10:
-                    retry_seconds = random.randint(5, 30)
+                    retry_seconds = randint(5, 30)
                     big_report_request += " Re-request after {} seconds".format(
                         retry_seconds
                     )
@@ -107,7 +107,7 @@ class YandexMetrikaClientAdapterAbstract(JSONAdapterMixin, TapiocaAdapter):
 
         if code == 429:
             if "quota_requests_by_ip" in errors_types:
-                retry_seconds = random.randint(1, 30)
+                retry_seconds = randint(1, 30)
                 error_text = "{} Re-request after {} seconds.".format(
                     limit_errors["quota_requests_by_ip"], retry_seconds
                 )
@@ -158,8 +158,8 @@ class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
             return None
 
         try:
-            return orjson.loads(text)
-        except orjson.JSONDecodeError:
+            return loads(text)
+        except JSONDecodeError:
             return text
 
     def fill_resource_template_url(self, template, url_params, **kwargs):

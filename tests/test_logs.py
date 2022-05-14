@@ -1,11 +1,12 @@
+from io import StringIO
+
 import orjson
 import pytest
 import pytest_asyncio
-from io import StringIO
-
-from aiotapioca_yandex_metrika import YandexMetrikaLogsAPI
 from response_data import LOGS_DATA
 from utils import make_url
+
+from aiotapioca_yandex_metrika import YandexMetrikaLogsAPI
 
 
 @pytest.fixture

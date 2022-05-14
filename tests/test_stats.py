@@ -1,10 +1,9 @@
 import orjson
 import pytest_asyncio
-
-from aiotapioca_yandex_metrika import YandexMetrikaStats
 from response_data import REPORTS_DATA
 from utils import make_url
 
+from aiotapioca_yandex_metrika import YandexMetrikaStats
 
 url_params = dict(
     ids=100500,
