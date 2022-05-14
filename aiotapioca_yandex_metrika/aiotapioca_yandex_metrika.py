@@ -277,9 +277,9 @@ class YandexMetrikaStatsClientAdapter(YandexMetrikaClientAdapterAbstract):
             offset2 = total_rows
 
         if sampled:
-            logger.info("Sample: {}".format(sample_share))
-        logger.info("Attribution: {}".format(attribution))
-        logger.info(
+            logger.debug("Sample: {}".format(sample_share))
+        logger.debug("Attribution: {}".format(attribution))
+        logger.debug(
             "Exported lines {}-{}. Total rows {}".format(offset, offset2, total_rows)
         )
 
