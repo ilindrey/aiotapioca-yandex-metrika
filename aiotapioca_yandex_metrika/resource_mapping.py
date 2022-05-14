@@ -1,76 +1,4 @@
-STATS_RESOURCE_MAPPING = {
-    "stats": {
-        "resource": "stat/v1/data",
-        "docs": "https://yandex.com/dev/metrika/doc/api2/api_v1/intro-docpage/",
-        "params": [
-            "direct_client_logins=<string,_string,...>",
-            "ids=<int,int,...>",
-            "metrics=<string>",
-            "accuracy=<string>",
-            "callback=<string>",
-            "date1=<string>",
-            "date2=<string>",
-            "dimensions=<string>",
-            "filters=<string>",
-            "include_undefined=<boolean>",
-            "lang=<string>",
-            "limit=<integer>",
-            "offset=<integer>",
-            "preset=<string>",
-            "pretty=<boolean>",
-            "proposed_accuracy=<boolean>",
-            "sort=<string>",
-            "timezone=<string>",
-        ],
-    },
-}
-
-LOGS_API_RESOURCE_MAPPING = {
-    "all_info": {
-        "resource": "management/v1/counter/{counterId}/logrequests",
-        "docs": "https://yandex.com/dev/metrika/doc/api2/logs/queries/getlogrequests-docpage/",
-        "params": None,
-        "methods": ["GET"],
-    },
-    "info": {
-        "resource": "management/v1/counter/{counterId}/logrequest/{requestId}",
-        "docs": "https://yandex.com/dev/metrika/doc/api2/logs/queries/getlogrequest-docpage/",
-        "params": None,
-        "methods": ["GET"],
-    },
-    "download": {
-        "resource": "management/v1/counter/{counterId}/logrequest/{requestId}/part/{partNumber}/download",
-        "docs": "https://yandex.com/dev/metrika/doc/api2/logs/queries/download-docpage/",
-        "params": None,
-        "methods": ["GET"],
-    },
-    "clean": {
-        "resource": "management/v1/counter/{counterId}/logrequest/{requestId}/clean",
-        "docs": "https://yandex.com/dev/metrika/doc/api2/logs/queries/clean-docpage/",
-        "params": None,
-        "methods": ["POST"],
-    },
-    "cancel": {
-        "resource": "management/v1/counter/{counterId}/logrequest/{requestId}/cancel",
-        "docs": "https://yandex.com/dev/metrika/doc/api2/logs/queries/cancel-docpage/",
-        "params": None,
-        "methods": ["POST"],
-    },
-    "create": {
-        "resource": "management/v1/counter/{counterId}/logrequests",
-        "docs": "https://yandex.com/dev/metrika/doc/api2/logs/queries/createlogrequest-docpage/",
-        "params": ["date1", "date2", "fields", "source"],
-        "methods": ["POST"],
-    },
-    "evaluate": {
-        "resource": "management/v1/counter/{counterId}/logrequests/evaluate",
-        "docs": "https://yandex.com/dev/metrika/doc/api2/logs/queries/evaluate-docpage/",
-        "params": ["date1", "date2", "fields", "source"],
-        "methods": ["GET"],
-    },
-}
-
-MANAGEMENT_RESOURCE_MAPPING = {
+MANAGEMENT_API_RESOURCE_MAPPING = {
     "counters": {
         "resource": "management/v1/counters",
         "docs": "https://yandex.com/dev/metrika/doc/api2/management/counters/counters-docpage/",
@@ -321,5 +249,77 @@ MANAGEMENT_RESOURCE_MAPPING = {
         "docs": "https://yandex.com/dev/metrika/doc/api2/management/offline_conversion/enablecallsextendedthreshold-docpage/",
         "params": None,
         "methods": ["POST", "DELETE"],
+    },
+}
+
+REPORTS_API_RESOURCE_MAPPING = {
+    "reports": {
+        "resource": "stat/v1/data",
+        "docs": "https://yandex.com/dev/metrika/doc/api2/api_v1/intro-docpage/",
+        "params": [
+            "direct_client_logins=<string,_string,...>",
+            "ids=<int,int,...>",
+            "metrics=<string>",
+            "accuracy=<string>",
+            "callback=<string>",
+            "date1=<string>",
+            "date2=<string>",
+            "dimensions=<string>",
+            "filters=<string>",
+            "include_undefined=<boolean>",
+            "lang=<string>",
+            "limit=<integer>",
+            "offset=<integer>",
+            "preset=<string>",
+            "pretty=<boolean>",
+            "proposed_accuracy=<boolean>",
+            "sort=<string>",
+            "timezone=<string>",
+        ],
+    },
+}
+
+LOGS_API_RESOURCE_MAPPING = {
+    "all_info": {
+        "resource": "management/v1/counter/{counterId}/logrequests",
+        "docs": "https://yandex.com/dev/metrika/doc/api2/logs/queries/getlogrequests-docpage/",
+        "params": None,
+        "methods": ["GET"],
+    },
+    "info": {
+        "resource": "management/v1/counter/{counterId}/logrequest/{requestId}",
+        "docs": "https://yandex.com/dev/metrika/doc/api2/logs/queries/getlogrequest-docpage/",
+        "params": None,
+        "methods": ["GET"],
+    },
+    "download": {
+        "resource": "management/v1/counter/{counterId}/logrequest/{requestId}/part/{partNumber}/download",
+        "docs": "https://yandex.com/dev/metrika/doc/api2/logs/queries/download-docpage/",
+        "params": None,
+        "methods": ["GET"],
+    },
+    "clean": {
+        "resource": "management/v1/counter/{counterId}/logrequest/{requestId}/clean",
+        "docs": "https://yandex.com/dev/metrika/doc/api2/logs/queries/clean-docpage/",
+        "params": None,
+        "methods": ["POST"],
+    },
+    "cancel": {
+        "resource": "management/v1/counter/{counterId}/logrequest/{requestId}/cancel",
+        "docs": "https://yandex.com/dev/metrika/doc/api2/logs/queries/cancel-docpage/",
+        "params": None,
+        "methods": ["POST"],
+    },
+    "create": {
+        "resource": "management/v1/counter/{counterId}/logrequests",
+        "docs": "https://yandex.com/dev/metrika/doc/api2/logs/queries/createlogrequest-docpage/",
+        "params": ["date1", "date2", "fields", "source"],
+        "methods": ["POST"],
+    },
+    "evaluate": {
+        "resource": "management/v1/counter/{counterId}/logrequests/evaluate",
+        "docs": "https://yandex.com/dev/metrika/doc/api2/logs/queries/evaluate-docpage/",
+        "params": ["date1", "date2", "fields", "source"],
+        "methods": ["GET"],
     },
 }

@@ -5,7 +5,7 @@ from orjson import loads
 from response_data import REPORTS_DATA
 from utils import make_url
 
-from aiotapioca_yandex_metrika import YandexMetrikaStats
+from aiotapioca_yandex_metrika import YandexMetrikaReportsAPI
 
 url_params = dict(
     ids=100500,
@@ -22,19 +22,19 @@ url_params = dict(
 
 @pytest_asyncio.fixture
 async def client():
-    async with YandexMetrikaStats(access_token="token") as c:
+    async with YandexMetrikaReportsAPI(access_token="token") as c:
         yield c
 
 
 async def test_stats_data(mocked, client):
     mocked.get(
-        make_url(client.stats().data, url_params),
+        make_url(client.reports().data, url_params),
         body=REPORTS_DATA,
         status=200,
         content_type="application/json",
     )
 
-    response = await client.stats().get(params=url_params)
+    response = await client.reports().get(params=url_params)
 
     assert response().data == loads(REPORTS_DATA)
     assert response.query.ids().data == [100500]
@@ -46,13 +46,13 @@ async def test_stats_data(mocked, client):
 
 async def test_transform(mocked, client):
     mocked.get(
-        make_url(client.stats().data, url_params),
+        make_url(client.reports().data, url_params),
         body=REPORTS_DATA,
         status=200,
         content_type="application/json",
     )
 
-    response = await client.stats().get(params=url_params)
+    response = await client.reports().get(params=url_params)
 
     response_data = loads(REPORTS_DATA)
 
@@ -83,17 +83,17 @@ async def test_iteration(mocked, client):
 
     response_data = loads(REPORTS_DATA)
 
-    url_1 = make_url(client.stats().data, url_params)
+    url_1 = make_url(client.reports().data, url_params)
 
     url_2_params = dict(url_params)
     url_2_params["offset"] = url_params.get("offset", 1) + 1
 
-    url_2 = make_url(client.stats().data, url_2_params)
+    url_2 = make_url(client.reports().data, url_2_params)
 
     mocked.get(url_1, body=REPORTS_DATA, status=200, content_type="application/json")
     mocked.get(url_2, body=REPORTS_DATA, status=200, content_type="application/json")
 
-    report = await client.stats().get(params=dict(url_params))
+    report = await client.reports().get(params=dict(url_params))
 
     i = 0
     max_pages = 1

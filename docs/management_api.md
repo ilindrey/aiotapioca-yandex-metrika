@@ -4,12 +4,12 @@
 
 
 ```python
-from aiotapioca_yandex_metrika import YandexMetrikaManagement
+from aiotapioca_yandex_metrika import YandexMetrikaManagementAPI
 
 ACCESS_TOKEN = ""
 COUNTER_ID = ""
 
-async with YandexMetrikaManagement(
+async with YandexMetrikaManagementAPI(
     access_token=ACCESS_TOKEN,
     default_url_params={'counterId': COUNTER_ID}
 ) as client:
@@ -52,9 +52,9 @@ await client.counters().options(data: dict = None, params: dict = None)
 ```
 
 ```python
-from aiotapioca_yandex_metrika import YandexMetrikaManagement
+from aiotapioca_yandex_metrika import YandexMetrikaManagementAPI
 
-async with YandexMetrikaManagement(...) as client:
+async with YandexMetrikaManagementAPI(...) as client:
 
     # Get counters. Via HTTP GET method.
     counters = await client.counters().get()

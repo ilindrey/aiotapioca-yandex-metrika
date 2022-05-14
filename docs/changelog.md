@@ -15,7 +15,7 @@
 
 ## Release 2021.5.15
 
-### Reporting API
+### Reports API
 
 - add iteration method "iter_values"
 - add iteration method "iter_dicts"
@@ -40,7 +40,7 @@
 - add attribut "data"
 - add attribut "response"
 
-### Reporting API
+### Reports API
 
 **Backward Incompatible Change**
 

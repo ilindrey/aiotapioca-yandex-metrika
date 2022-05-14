@@ -4,7 +4,7 @@ __version__ = "2022.04.23"
 
 from .aiotapioca_yandex_metrika import (
     YandexMetrikaLogsAPI,
-    YandexMetrikaManagement,
-    YandexMetrikaStats,
+    YandexMetrikaManagementAPI,
+    YandexMetrikaReportsAPI,
 )
 from .resource_mapping import *

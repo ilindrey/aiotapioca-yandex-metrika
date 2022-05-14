@@ -4,12 +4,12 @@
 
 ```python
 import datetime as dt
-from aiotapioca_yandex_metrika import YandexMetrikaStats
+from aiotapioca_yandex_metrika import YandexMetrikaReportsAPI
 
 ACCESS_TOKEN = ""
 COUNTER_ID = ""
 
-async with YandexMetrikaStats(access_token=ACCESS_TOKEN) as client:
+async with YandexMetrikaReportsAPI(access_token=ACCESS_TOKEN) as client:
 
     params = dict(
         ids=COUNTER_ID,
@@ -21,7 +21,7 @@ async with YandexMetrikaStats(access_token=ACCESS_TOKEN) as client:
         lang="en",
         # Other params -> https://yandex.com/dev/metrika/doc/api2/api_v1/data.html
     )
-    report = await client.stats().get(params=params)
+    report = await client.reports().get(params=params)
 
     # Raw data
     print(report().data)
@@ -56,10 +56,10 @@ async with YandexMetrikaStats(access_token=ACCESS_TOKEN) as client:
 
 ## Export of all report pages.
 ```python
-from aiotapioca_yandex_metrika import YandexMetrikaStats
+from aiotapioca_yandex_metrika import YandexMetrikaReportsAPI
 
-async with YandexMetrikaStats(access_token=...) as client:
-    report = await client.stats().get(params=...)
+async with YandexMetrikaReportsAPI(access_token=...) as client:
+    report = await client.reports().get(params=...)
 
     print("iteration report pages")
     async for page in report().pages():
@@ -98,11 +98,11 @@ async with YandexMetrikaStats(access_token=...) as client:
     .pages(max_pages: int = None, max_items: int = None)
 
 ```python
-from aiotapioca_yandex_metrika import YandexMetrikaStats
+from aiotapioca_yandex_metrika import YandexMetrikaReportsAPI
 
-async with YandexMetrikaStats(access_token=...) as client:
+async with YandexMetrikaReportsAPI(access_token=...) as client:
 
-    report = await client.stats().get(params=...)
+    report = await client.reports().get(params=...)
 
     print("iteration report rows with limit")
     async for page in report().pages(max_pages=2):
@@ -115,11 +115,11 @@ async with YandexMetrikaStats(access_token=...) as client:
 
 ## Response
 ```python
-from aiotapioca_yandex_metrika import YandexMetrikaStats
+from aiotapioca_yandex_metrika import YandexMetrikaReportsAPI
 
-async with YandexMetrikaStats(access_token=...) as client:
+async with YandexMetrikaReportsAPI(access_token=...) as client:
 
-    report = await client.stats().get(params=...)
+    report = await client.reports().get(params=...)
 
     executor = report()
     print(executor.data)

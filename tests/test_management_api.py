@@ -1,12 +1,12 @@
 import pytest_asyncio
 from response_data import COUNTERS_DATA, GOAL_DATA, GOALS_DATA
 
-from aiotapioca_yandex_metrika import YandexMetrikaManagement
+from aiotapioca_yandex_metrika import YandexMetrikaManagementAPI
 
 
 @pytest_asyncio.fixture
 async def client():
-    async with YandexMetrikaManagement(access_token="token") as c:
+    async with YandexMetrikaManagementAPI(access_token="token") as c:
         yield c
 
 

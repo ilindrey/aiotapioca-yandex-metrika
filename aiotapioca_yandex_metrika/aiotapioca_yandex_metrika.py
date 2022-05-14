@@ -25,8 +25,8 @@ from .exceptions import (
 )
 from .resource_mapping import (
     LOGS_API_RESOURCE_MAPPING,
-    MANAGEMENT_RESOURCE_MAPPING,
-    STATS_RESOURCE_MAPPING,
+    MANAGEMENT_API_RESOURCE_MAPPING,
+    REPORTS_API_RESOURCE_MAPPING,
 )
 from .serializers import LogsAPISerializer, StatsSerializer
 
@@ -144,8 +144,71 @@ class YandexMetrikaClientAdapterAbstract(JSONAdapterMixin, TapiocaAdapter):
             super().error_handling(exception, error_message, repeat_number, **kwargs)
 
 
-class YandexMetrikaManagementClientAdapter(YandexMetrikaClientAdapterAbstract):
-    resource_mapping = MANAGEMENT_RESOURCE_MAPPING
+class YandexMetrikaManagementAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
+    resource_mapping = MANAGEMENT_API_RESOURCE_MAPPING
+
+
+class YandexMetrikaReportsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
+    resource_mapping = REPORTS_API_RESOURCE_MAPPING
+    serializer_class = StatsSerializer
+
+    @staticmethod
+    def _convert_date_to_str_format(dt):
+        if isinstance(dt, date):
+            return dt.strftime("%Y-%m-%d")
+        elif isinstance(dt, str):
+            return dt
+        else:
+            raise TypeError(
+                'Parameters "date1" and "date2" must be of the datetime, date or string type.'
+            )
+
+    def get_request_kwargs(self, *args, **kwargs):
+        arguments = super().get_request_kwargs(*args, **kwargs)
+
+        params = arguments.get("params")
+        if params:
+            params["date1"] = self._convert_date_to_str_format(params.get("date1"))
+            params["date2"] = self._convert_date_to_str_format(params.get("date2"))
+
+        arguments["params"] = params
+
+        return arguments
+
+    async def process_response(self, response, **kwargs):
+        data = await super().process_response(response, **kwargs)
+        attribution = data["query"]["attribution"]
+        sampled = data["sampled"]
+        sample_share = data["sample_share"]
+        total_rows = int(data["total_rows"])
+        offset = data["query"]["offset"]
+        limit = int(response.url.query.get("limit", LIMIT))
+        offset2 = offset + limit - 1
+        if offset2 > total_rows:
+            offset2 = total_rows
+
+        if sampled:
+            logger.debug("Sample: {}".format(sample_share))
+        logger.debug("Attribution: {}".format(attribution))
+        logger.debug(
+            "Exported lines {}-{}. Total rows {}".format(offset, offset2, total_rows)
+        )
+
+        return data
+
+    def get_iterator_next_request_kwargs(
+        self, request_kwargs, data, response, **kwargs
+    ):
+        total_rows = int(data["total_rows"])
+        limit = request_kwargs["params"].get("limit", LIMIT)
+        offset = data["query"]["offset"] + limit
+
+        if offset <= total_rows:
+            request_kwargs["params"]["offset"] = offset
+            return request_kwargs
+
+    def get_iterator_list(self, data, **kwargs):
+        return [data]
 
 
 class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
@@ -261,71 +324,10 @@ class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
         )
 
 
-class YandexMetrikaStatsClientAdapter(YandexMetrikaClientAdapterAbstract):
-    resource_mapping = STATS_RESOURCE_MAPPING
-    serializer_class = StatsSerializer
-
-    @staticmethod
-    def _convert_date_to_str_format(dt):
-        if isinstance(dt, date):
-            return dt.strftime("%Y-%m-%d")
-        elif isinstance(dt, str):
-            return dt
-        else:
-            raise TypeError(
-                'Parameters "date1" and "date2" must be of the datetime, date or string type.'
-            )
-
-    def get_request_kwargs(self, *args, **kwargs):
-        arguments = super().get_request_kwargs(*args, **kwargs)
-
-        params = arguments.get("params")
-        if params:
-            params["date1"] = self._convert_date_to_str_format(params.get("date1"))
-            params["date2"] = self._convert_date_to_str_format(params.get("date2"))
-
-        arguments["params"] = params
-
-        return arguments
-
-    async def process_response(self, response, **kwargs):
-        data = await super().process_response(response, **kwargs)
-        attribution = data["query"]["attribution"]
-        sampled = data["sampled"]
-        sample_share = data["sample_share"]
-        total_rows = int(data["total_rows"])
-        offset = data["query"]["offset"]
-        limit = int(response.url.query.get("limit", LIMIT))
-        offset2 = offset + limit - 1
-        if offset2 > total_rows:
-            offset2 = total_rows
-
-        if sampled:
-            logger.debug("Sample: {}".format(sample_share))
-        logger.debug("Attribution: {}".format(attribution))
-        logger.debug(
-            "Exported lines {}-{}. Total rows {}".format(offset, offset2, total_rows)
-        )
-
-        return data
-
-    def get_iterator_next_request_kwargs(
-        self, request_kwargs, data, response, **kwargs
-    ):
-        total_rows = int(data["total_rows"])
-        limit = request_kwargs["params"].get("limit", LIMIT)
-        offset = data["query"]["offset"] + limit
-
-        if offset <= total_rows:
-            request_kwargs["params"]["offset"] = offset
-            return request_kwargs
-
-    def get_iterator_list(self, data, **kwargs):
-        return [data]
-
-
-YandexMetrikaStats = generate_wrapper_from_adapter(YandexMetrikaStatsClientAdapter)
-YandexMetrikaLogsAPI = generate_wrapper_from_adapter(YandexMetrikaLogsAPIClientAdapter)
-YandexMetrikaManagement = generate_wrapper_from_adapter(
-    YandexMetrikaManagementClientAdapter
+YandexMetrikaReportsAPI = generate_wrapper_from_adapter(
+    YandexMetrikaReportsAPIClientAdapter
 )
+YandexMetrikaManagementAPI = generate_wrapper_from_adapter(
+    YandexMetrikaManagementAPIClientAdapter
+)
+YandexMetrikaLogsAPI = generate_wrapper_from_adapter(YandexMetrikaLogsAPIClientAdapter)
