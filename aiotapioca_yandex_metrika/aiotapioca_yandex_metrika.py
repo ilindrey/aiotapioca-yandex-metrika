@@ -50,6 +50,12 @@ class YandexMetrikaClientAdapterAbstract(JSONAdapterMixin, TapiocaAdapter):
         )
         return arguments
 
+    def get_iterator_list(self, data, **kwargs):
+        if data:
+            return [data]
+        else:
+            return []
+
     async def get_error_message(self, data, response=None, **kwargs):
         if data is None:
             return {"error_text": await response.text()}
@@ -79,7 +85,7 @@ class YandexMetrikaClientAdapterAbstract(JSONAdapterMixin, TapiocaAdapter):
         response = kwargs["response"]
         error_message = error_message if error_message else {}
 
-        code = response.status if response else int(error_message.get("code", 0))
+        code = int(error_message.get("code", response.status))
         message = error_message.get("message", "")
         errors_types = [i.get("error_type") for i in error_message.get("errors", [])]
 
@@ -147,6 +153,47 @@ class YandexMetrikaClientAdapterAbstract(JSONAdapterMixin, TapiocaAdapter):
 class YandexMetrikaManagementAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
     resource_mapping = MANAGEMENT_API_RESOURCE_MAPPING
 
+    def get_request_kwargs(self, *args, **kwargs):
+        arguments = super().get_request_kwargs(*args, **kwargs)
+
+        if self.resource_mapping["counters"] == kwargs["resource"]:
+            params = arguments.get("params", {})
+            params.setdefault("per_page", LIMIT)
+            arguments["params"] = params
+
+        return arguments
+
+    async def process_response(self, response, **kwargs):
+        data = await super().process_response(response, **kwargs)
+
+        if self.resource_mapping["counters"] == kwargs["resource"]:
+            total_rows = data["rows"]
+            per_page = int(response.url.query.get("per_page", LIMIT))
+            offset = int(response.url.query.get("offset", 1)) + per_page
+            offset2 = offset + per_page - 1
+            if offset2 > total_rows:
+                offset2 = total_rows
+
+            logger.debug(
+                "Exported lines {}-{}. Total rows {}".format(
+                    offset, offset2, total_rows
+                )
+            )
+
+        return data
+
+    def get_iterator_next_request_kwargs(
+        self, request_kwargs, data, response, **kwargs
+    ):
+        if self.resource_mapping["counters"] == kwargs["resource"]:
+            total_rows = data["rows"]
+            per_page = int(response.url.query.get("per_page", LIMIT))
+            offset = int(response.url.query.get("offset", 1)) + per_page
+
+            if offset <= total_rows:
+                request_kwargs["params"]["offset"] = offset
+                return request_kwargs
+
 
 class YandexMetrikaReportsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
     resource_mapping = REPORTS_API_RESOURCE_MAPPING
@@ -166,10 +213,12 @@ class YandexMetrikaReportsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
     def get_request_kwargs(self, *args, **kwargs):
         arguments = super().get_request_kwargs(*args, **kwargs)
 
-        params = arguments.get("params")
+        params = arguments.get("params", {})
         if params:
             params["date1"] = self._convert_date_to_str_format(params.get("date1"))
             params["date2"] = self._convert_date_to_str_format(params.get("date2"))
+
+        params.setdefault("limit", LIMIT)
 
         arguments["params"] = params
 
@@ -180,9 +229,9 @@ class YandexMetrikaReportsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
         attribution = data["query"]["attribution"]
         sampled = data["sampled"]
         sample_share = data["sample_share"]
-        total_rows = int(data["total_rows"])
+        total_rows = data["total_rows"]
+        limit = data["query"]["limit"]
         offset = data["query"]["offset"]
-        limit = int(response.url.query.get("limit", LIMIT))
         offset2 = offset + limit - 1
         if offset2 > total_rows:
             offset2 = total_rows
@@ -199,16 +248,13 @@ class YandexMetrikaReportsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
     def get_iterator_next_request_kwargs(
         self, request_kwargs, data, response, **kwargs
     ):
-        total_rows = int(data["total_rows"])
-        limit = request_kwargs["params"].get("limit", LIMIT)
-        offset = data["query"]["offset"] + limit
+        total_rows = data["total_rows"]
+        limit = int(response.url.query.get("limit", LIMIT))
+        offset = int(response.url.query.get("offset", 1)) + limit
 
         if offset <= total_rows:
             request_kwargs["params"]["offset"] = offset
             return request_kwargs
-
-    def get_iterator_list(self, data, **kwargs):
-        return [data]
 
 
 class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
@@ -244,12 +290,6 @@ class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
         next_part = part + 1
         new_url = re.sub(r"part/[0-9]*/", "part/{}/".format(next_part), url)
         return {**request_kwargs, "url": new_url}
-
-    def get_iterator_list(self, data, **kwargs):
-        if data:
-            return [data]
-        else:
-            return []
 
     async def _check_status_report(self, response, api_params, **kwargs):
         request_id = api_params["default_url_params"].get("requestId")

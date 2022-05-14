@@ -58,7 +58,8 @@ async with YandexMetrikaManagementAPI(...) as client:
 
     # Get counters. Via HTTP GET method.
     counters = await client.counters().get()
-    print(counters().data)
+    async for page in counters().pages():
+        print(page().data)
 
     # Get counters sorted by visit. Via HTTP GET method.
     counters = await client.counters().get(params={"sort": "Visits"})
