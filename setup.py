@@ -22,6 +22,7 @@ test_requirements = [
 dev_requirements = [
     *test_requirements,
     "black>=22.0",
+    "isort>=5.10.0",
 ]
 
 
