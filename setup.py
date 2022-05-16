@@ -13,7 +13,7 @@ with open("README.md", "r", encoding="utf8") as fh:
 
 package = "aiotapioca_yandex_metrika"
 
-requirements = ["aiohttp>=3.0", "aiotapioca-wrapper>=3.6.0", "orjson>=3.0.0"]
+requirements = ["aiohttp>=3.0", "aiotapioca-wrapper>=3.8.0", "orjson>=3.0.0"]
 test_requirements = [
     "pytest>=7.0",
     "pytest-asyncio>=0.18",

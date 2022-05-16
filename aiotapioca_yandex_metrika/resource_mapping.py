@@ -1,3 +1,5 @@
+from .parsers import LogsAPIParser, ReportsAPIParser
+
 MANAGEMENT_API_RESOURCE_MAPPING = {
     "counters": {
         "resource": "management/v1/counters",
@@ -276,6 +278,12 @@ REPORTS_API_RESOURCE_MAPPING = {
             "sort=<string>",
             "timezone=<string>",
         ],
+        "parsers": {
+            "headers": ReportsAPIParser.headers,
+            "values": ReportsAPIParser.values,
+            "dicts": ReportsAPIParser.dicts,
+            "columns": ReportsAPIParser.columns,
+        },
     },
 }
 
@@ -297,6 +305,13 @@ LOGS_API_RESOURCE_MAPPING = {
         "docs": "https://yandex.com/dev/metrika/doc/api2/logs/queries/download-docpage/",
         "params": None,
         "methods": ["GET"],
+        "parsers": {
+            "headers": LogsAPIParser.headers,
+            "lines": LogsAPIParser.lines,
+            "values": LogsAPIParser.values,
+            "dicts": LogsAPIParser.dicts,
+            "columns": LogsAPIParser.columns,
+        },
     },
     "clean": {
         "resource": "management/v1/counter/{counterId}/logrequest/{requestId}/clean",

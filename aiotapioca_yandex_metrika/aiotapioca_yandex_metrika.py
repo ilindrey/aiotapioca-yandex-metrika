@@ -28,7 +28,6 @@ from .resource_mapping import (
     MANAGEMENT_API_RESOURCE_MAPPING,
     REPORTS_API_RESOURCE_MAPPING,
 )
-from .serializers import LogsAPISerializer, StatsSerializer
 
 logger = getLogger(__name__)
 
@@ -197,7 +196,6 @@ class YandexMetrikaManagementAPIClientAdapter(YandexMetrikaClientAdapterAbstract
 
 class YandexMetrikaReportsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
     resource_mapping = REPORTS_API_RESOURCE_MAPPING
-    serializer_class = StatsSerializer
 
     @staticmethod
     def _convert_date_to_str_format(dt):
@@ -259,7 +257,6 @@ class YandexMetrikaReportsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
 
 class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
     resource_mapping = LOGS_API_RESOURCE_MAPPING
-    serializer_class = LogsAPISerializer
 
     async def response_to_native(self, response, **kwargs):
         text = await response.text()

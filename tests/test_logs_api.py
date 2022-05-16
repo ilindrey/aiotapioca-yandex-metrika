@@ -245,28 +245,28 @@ async def test_transform(mocked, client):
 
     log = await client.download(requestId=0).get()
 
-    assert log().to_headers() == ["col1", "col2", "col3", "col4", "col5"]
+    assert log().headers() == ["col1", "col2", "col3", "col4", "col5"]
 
-    assert log().to_values() == [
+    assert log().values() == [
         ["val1", "val2", "val3", "val4", "val5"],
         ["val11", "val22", "val33", "val44", "val55"],
         ["val111", "val222", "val333", "val444", "val555"],
         ["val1111", "val2222", "val3333", "val4444", "val5555"],
     ]
-    assert log().to_lines() == [
+    assert log().lines() == [
         "val1\tval2\tval3\tval4\tval5",
         "val11\tval22\tval33\tval44\tval55",
         "val111\tval222\tval333\tval444\tval555",
         "val1111\tval2222\tval3333\tval4444\tval5555",
     ]
-    assert log().to_columns() == [
+    assert log().columns() == [
         ["val1", "val11", "val111", "val1111"],
         ["val2", "val22", "val222", "val2222"],
         ["val3", "val33", "val333", "val3333"],
         ["val4", "val44", "val444", "val4444"],
         ["val5", "val55", "val555", "val5555"],
     ]
-    assert log().to_dicts() == [
+    assert log().dicts() == [
         {
             "col1": "val1",
             "col2": "val2",
@@ -332,21 +332,21 @@ async def test_iteration(mocked, client):
 
     max_parts = 2
     async for part in log().pages(max_pages=max_parts):
-        assert len(part().to_lines()) == 4
-        assert len(part().to_values()) == 4
-        assert len(part().to_columns()) == 5
-        assert len(part().to_dicts()) == 4
+        assert len(part().lines()) == 4
+        assert len(part().values()) == 4
+        assert len(part().columns()) == 5
+        assert len(part().dicts()) == 4
 
-        assert part().to_headers() == ["col1", "col2", "col3", "col4", "col5"]
+        assert part().headers() == ["col1", "col2", "col3", "col4", "col5"]
 
-        for line, expected in zip(part().to_lines(), expected_lines):
+        for line, expected in zip(part().lines(), expected_lines):
             assert line == expected
 
-        for values, expected in zip(part().to_values(), expected_values):
+        for values, expected in zip(part().values(), expected_values):
             assert values == expected
 
-        for values, expected in zip(part().to_columns(), expected_columns):
+        for values, expected in zip(part().columns(), expected_columns):
             assert values == expected
 
-        for values, expected in zip(part().to_dicts(), expected_dicts):
+        for values, expected in zip(part().dicts(), expected_dicts):
             assert values == expected

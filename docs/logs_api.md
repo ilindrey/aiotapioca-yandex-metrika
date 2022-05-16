@@ -13,43 +13,36 @@ params = {
     "source": "visits",
     "date1": "2021-01-01",
     "date2": "2021-01-01"
-}
+    }
 
 async with YandexMetrikaLogsAPI(
     access_token=ACCESS_TOKEN,
     default_url_params={'counterId': COUNTER_ID}
-) as client:
-
+    ) as client:
     # Check the possibility of creating a report. Via HTTP GET method.
     result = await client.evaluate().get(params=params)
     print(result)
-
 
     # Order a report. Via HTTP POST method.
     result = await client.create().post(params=params)
     request_id = result().data["log_request"]["request_id"]
     print(result)
 
-
     # Cancel report creation. Via HTTP POST method.
     result = await client.cancel(requestId=request_id).post()
     print(result)
-
 
     # Delete report. Via HTTP POST method.
     result = await client.clean(requestId=request_id).post()
     print(result)
 
-
     # Get information about all reports stored on the server. Via HTTP GET method.
     result = await client.allinfo().get()
     print(result)
 
-
     # Get information about a specific report. Via HTTP GET method.
     result = await client.info(requestId=request_id).get()
     print(result)
-
 
     # Download the report. Via HTTP POST method.
     result = await client.create().post(params=params)
@@ -73,19 +66,19 @@ async with YandexMetrikaLogsAPI(
         data = executor.data[:1000]
 
         print("Column names")
-        print(executor.to_headers())
+        print(executor.headers())
 
         # Transform to values
-        print(executor.to_values()[:3])
+        print(executor.values()[:3])
 
         # Transform to lines
-        print(executor.to_lines()[:3])
+        print(executor.lines()[:3])
 
         # Transform to dicts
-        print(executor.to_dicts()[:3])
+        print(executor.dicts()[:3])
 
         # Transform to columns
-        print(executor.to_columns()[:3])
+        print(executor.columns()[:3])
     else:
         print("Report not ready yet")
 ```
@@ -100,18 +93,18 @@ from aiotapioca_yandex_metrika import YandexMetrikaLogsAPI
 ACCESS_TOKEN = ""
 COUNTER_ID = ""
 
-params={
+params = {
     "fields": "ym:s:date,ym:s:clientID,ym:s:dateTime,ym:s:startURL,ym:s:endURL",
     "source": "visits",
     "date1": "2019-01-01",
     "date2": "2019-01-01"
-}
+    }
 async with YandexMetrikaLogsAPI(
     access_token=ACCESS_TOKEN,
     default_url_params={'counterId': COUNTER_ID},
     # Download the report when it will be created
     wait_report=True,
-) as client:
+    ) as client:
     info = await client.create().post(params=params)
     request_id = info["log_request"]["request_id"]
 
@@ -123,27 +116,27 @@ async with YandexMetrikaLogsAPI(
     data = executor.data
 
     print("Column names")
-    print(executor.to_headers())
+    print(executor.headers())
 
     # Transform to values
-    print(executor.to_values())
+    print(executor.values())
 
     # Transform to lines
-    print(executor.to_lines())
+    print(executor.lines())
 
     # Transform to dict
-    print(executor.to_dicts())
+    print(executor.dicts())
 
     # Transform to columns
-    print(executor.to_columns())
+    print(executor.columns())
 ```
 
 ## Export of all report parts.
+
 ```python
 from aiotapioca_yandex_metrika import YandexMetrikaLogsAPI
 
 async with YandexMetrikaLogsAPI(...) as client:
-
     info = await client.create().post(params=...)
     request_id = info["log_request"]["request_id"]
     report = await client.download(requestId=request_id).get()
@@ -154,22 +147,22 @@ async with YandexMetrikaLogsAPI(...) as client:
     async for part in report().page():
         executor = part()
         print(executor.data)  # raw data
-        print(executor.to_values())
-        print(executor.to_lines())
-        print(executor.to_columns())  # columns data orient
-        print(executor.to_dicts())
+        print(executor.values())
+        print(executor.lines())
+        print(executor.columns())  # columns data orient
+        print(executor.dicts())
 
     async for part in report().page():
         # Iteration lines.
-        for row_as_text in part().to_lines():
+        for row_as_text in part().lines():
             print(row_as_text)
 
         # Iteration values.
-        for row_as_values in part().to_values():
+        for row_as_values in part().values():
             print(row_as_values)
 
         # Iteration dicts.
-        for row_as_dict in part().to_dicts():
+        for row_as_dict in part().dicts():
             print(row_as_dict)
 
 

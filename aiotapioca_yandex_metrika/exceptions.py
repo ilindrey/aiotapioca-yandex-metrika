@@ -1,13 +1,13 @@
 class YandexMetrikaApiError(Exception):
     def __init__(self, response, message=None, *args, **kwargs):
         self.response = response
-        self.message = message
+        self.message = message or ""
 
     def __str__(self):
         return "{} {} {}\nHEADERS = {}\nURL = {}".format(
             self.response.status,
             self.response.reason,
-            self.message or "",
+            self.message,
             self.response.headers,
             self.response.url,
         )

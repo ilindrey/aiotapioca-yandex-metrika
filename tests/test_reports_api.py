@@ -57,20 +57,20 @@ async def test_transform(mocked, client):
     response_data = loads(REPORTS_DATA)
 
     assert response().data == response_data
-    assert response().to_headers() == ["ym:s:date", "ym:s:visits"]
+    assert response().headers() == ["ym:s:date", "ym:s:visits"]
 
-    assert response().to_values() == [
+    assert response().values() == [
         ["2020-10-01", 14234.0],
         ["2020-10-02", 12508.0],
         ["2020-10-03", 12365.0],
         ["2020-10-04", 14588.0],
         ["2020-10-05", 14579.0],
     ]
-    assert response().to_columns() == [
+    assert response().columns() == [
         ["2020-10-01", "2020-10-02", "2020-10-03", "2020-10-04", "2020-10-05"],
         [14234.0, 12508.0, 12365.0, 14588.0, 14579.0],
     ]
-    assert response().to_dicts() == [
+    assert response().dicts() == [
         {"ym:s:date": "2020-10-01", "ym:s:visits": 14234.0},
         {"ym:s:date": "2020-10-02", "ym:s:visits": 12508.0},
         {"ym:s:date": "2020-10-03", "ym:s:visits": 12365.0},
@@ -100,21 +100,21 @@ async def test_iteration(mocked, client):
     async for page in report().pages(max_pages=max_pages):
 
         assert page().data == response_data
-        assert page().to_headers() == ["ym:s:date", "ym:s:visits"]
+        assert page().headers() == ["ym:s:date", "ym:s:visits"]
 
-        for row in page().to_values():
+        for row in page().values():
             assert len(row) == 2
             assert isinstance(row, list)
             assert isinstance(row[0], str)
             assert isinstance(row[1], float)
 
-        for row in page().to_dicts():
+        for row in page().dicts():
             assert len(row) == 2
             assert isinstance(row, dict)
             assert isinstance(row["ym:s:date"], str)
             assert isinstance(row["ym:s:visits"], float)
 
-        for index, row in enumerate(page().to_columns()):
+        for index, row in enumerate(page().columns()):
             assert len(row) == 5
             assert isinstance(row, list)
             for item in row:
