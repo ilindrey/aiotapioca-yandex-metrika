@@ -1,12 +1,30 @@
 
 # CHANGELOG
 
+## Release 2022.5.16
+
+- Reworked exception handling
+- Added YandexMetrikaServerError
+- Replaced setup.cfg with pyproject.toml
+- Changed output to debug level in YandexMetrikaStatsClientAdapter.process_response
+- Added conversion of date1 and date2 to a string in the appropriate format
+- Update docs. Added generic change log file
+- Renamed clients YandexMetrikaManagement -> YandexMetrikaManagementAPI and YandexMetrikaStats -> YandexMetrikaReportsAPI
+- Added support for pagination when requesting counters
+- Replaced serializers with data parsers
+- Updated aiotapioca-wrapper library to version 3.8.0
+
+## Release 2022.4.23
+
+- Updated aiotapioca-wrapper library to version 3.6.0
+
 ## Release 2022.4.13
 
 ### Logs API
 - Changes related to the original library [commit](https://github.com/pavelmaksimov/tapi-yandex-metrika/commit/db8e6b09643e553bce865e8ee4199c0756635f9c). Stop waiting a report if the report status is invalid by raising an error
 
 ## Release 2022.3.26
+
 - An asynchronous fork was created. The original library became asynchronous, based on aiotapioca-wrapper
 
 ## Release 2021.5.28
