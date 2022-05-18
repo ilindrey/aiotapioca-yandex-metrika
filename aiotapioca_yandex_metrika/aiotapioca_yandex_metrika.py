@@ -1,6 +1,5 @@
 import re
 import time
-from asyncio import run as asyncio_run
 from datetime import date
 from inspect import isclass
 from logging import getLogger
@@ -42,7 +41,6 @@ class YandexMetrikaClientAdapterAbstract(JSONAdapterMixin, TapiocaAdapter):
         api_params = kwargs.get("api_params", {})
         if "receive_all_data" in api_params:
             raise BackwardCompatibilityError("parameter 'receive_all_data'")
-
         arguments = super().get_request_kwargs(*args, **kwargs)
         arguments["headers"]["Authorization"] = "OAuth {}".format(
             api_params["access_token"]
@@ -73,7 +71,7 @@ class YandexMetrikaClientAdapterAbstract(JSONAdapterMixin, TapiocaAdapter):
             raise ResponseProcessException(YandexMetrikaServerError, data)
         return data
 
-    def retry_request(
+    async def retry_request(
         self,
         exception=None,
         error_message=None,
@@ -212,9 +210,11 @@ class YandexMetrikaReportsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
         arguments = super().get_request_kwargs(*args, **kwargs)
 
         params = arguments.get("params", {})
-        if params:
-            params["date1"] = self._convert_date_to_str_format(params.get("date1"))
-            params["date2"] = self._convert_date_to_str_format(params.get("date2"))
+
+        if "date1" in params:
+            params["date1"] = self._convert_date_to_str_format(params["date1"])
+        if "date2" in params:
+            params["date2"] = self._convert_date_to_str_format(params["date2"])
 
         params.setdefault("limit", LIMIT)
 
@@ -260,10 +260,8 @@ class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
 
     async def response_to_native(self, response, **kwargs):
         text = await response.text()
-
         if not text:
             return None
-
         try:
             return loads(text)
         except JSONDecodeError:
@@ -300,7 +298,7 @@ class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
                     message=f"Such status '{status}' of the report does not allow downloading it",
                 )
 
-    def retry_request(
+    async def retry_request(
         self,
         exception=None,
         error_message=None,
@@ -320,7 +318,7 @@ class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
             and "download" in request_kwargs["url"]
             and api_params.get("wait_report", False)
         ):
-            asyncio_run(self._check_status_report(response, api_params, **kwargs))
+            await self._check_status_report(response, api_params, **kwargs)
 
             # The error appears when trying to download an unprepared report.
             max_sleep = 60 * 5
@@ -331,7 +329,7 @@ class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
 
             return True
 
-        return super().retry_request(
+        return await super().retry_request(
             exception,
             error_message,
             repeat_number,

@@ -26,7 +26,7 @@ async def client():
         yield c
 
 
-async def test_stats_data(mocked, client):
+async def test_reports_data(mocked, client):
     mocked.get(
         make_url(client.reports().data, url_params),
         body=REPORTS_DATA,

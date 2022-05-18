@@ -1,6 +1,6 @@
-import json
+from orjson import dumps
 
-COUNTERS_DATA = json.dumps(
+COUNTERS_DATA = dumps(
     {
         "rows": 2,
         "counters": [
@@ -104,10 +104,9 @@ COUNTERS_DATA = json.dumps(
             },
         ],
     },
-    default=str,
 )
 
-GOALS_DATA = json.dumps(
+GOALS_DATA = dumps(
     {
         "goals": [
             {
@@ -134,10 +133,9 @@ GOALS_DATA = json.dumps(
             },
         ]
     },
-    default=str,
 )
 
-GOAL_DATA = json.dumps(
+GOAL_DATA = dumps(
     {
         "goal": {
             "id": 1234567,
@@ -151,11 +149,10 @@ GOAL_DATA = json.dumps(
             "conditions": [{"type": "contain", "url": "#signup"}],
         }
     },
-    default=str,
 )
 
 
-REPORTS_DATA = json.dumps(
+REPORTS_DATA = dumps(
     {
         "query": {
             "ids": [100500],
@@ -195,7 +192,6 @@ REPORTS_DATA = json.dumps(
         "min": [12365.0],
         "max": [14588.0],
     },
-    default=str,
 )
 
 LOGS_DATA = (
