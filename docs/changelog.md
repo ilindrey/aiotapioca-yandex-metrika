@@ -3,16 +3,16 @@
 
 ## Release 2022.5.16
 
-- Reworked exception handling
-- Added YandexMetrikaServerError
-- Replaced setup.cfg with pyproject.toml
-- Changed output to debug level in YandexMetrikaStatsClientAdapter.process_response
-- Added conversion of date1 and date2 to a string in the appropriate format
-- Update docs. Added generic change log file
-- Renamed clients YandexMetrikaManagement -> YandexMetrikaManagementAPI and YandexMetrikaStats -> YandexMetrikaReportsAPI
-- Added support for pagination when requesting counters
-- Replaced serializers with data parsers
 - Updated aiotapioca-wrapper library to version 3.8.0
+- Added generic change log file
+- Added YandexMetrikaServerError
+- Added conversion of date1 and date2 to a string in the appropriate format
+- Added support for pagination when requesting counters
+- Changed output to debug level in YandexMetrikaStatsClientAdapter.process_response
+- Reworked exception handling
+- Renamed clients YandexMetrikaManagement -> YandexMetrikaManagementAPI and YandexMetrikaStats -> YandexMetrikaReportsAPI
+- Replaced serializers with data parsers
+- Replaced setup.cfg with pyproject.toml
 
 ## Release 2022.4.23
 

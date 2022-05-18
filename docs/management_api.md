@@ -1,6 +1,6 @@
-# Yandex Metrika Counter Management API Documentation
+# Yandex Metrika Management API Documentation
 
-[Official documentation API Yandex Metrika](https://yandex.com/dev/metrika/doc/api2/management/intro.html)
+[Official documentation Yandex Metrika Management API](https://yandex.com/dev/metrika/doc/api2/management/intro.html)
 
 
 ```python

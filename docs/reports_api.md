@@ -1,6 +1,6 @@
-# Documentation for downloading reports from API Yandex Metrika.
+# Yandex Metrika Reports API Documentation
 
-[Official documentation API Yandex Metrika](https://yandex.com/dev/metrika/doc/api2/api_v1/data.html)
+[Official documentation Yandex Metrika Reports API](https://yandex.com/dev/metrika/doc/api2/api_v1/intro.html)
 
 ```python
 from datetime import date
