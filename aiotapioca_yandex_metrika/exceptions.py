@@ -1,7 +1,7 @@
-class YandexMetrikaApiError(Exception):
-    def __init__(self, response, message=None, *args, **kwargs):
-        self.response = response
-        self.message = message or ""
+from aiotapioca.exceptions import ResponseProcessException
+
+
+class YandexMetrikaApiError(ResponseProcessException):
 
     def __str__(self):
         return "{} {} {}\nHEADERS = {}\nURL = {}".format(
@@ -14,10 +14,9 @@ class YandexMetrikaApiError(Exception):
 
 
 class YandexMetrikaClientError(YandexMetrikaApiError):
-    def __init__(self, response, message=None, code=None, errors=None):
-        super().__init__(response, message)
+    def __init__(self, code=None, errors=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.code = code
-        self.message = message
         self.errors = errors
 
     def __str__(self):
