@@ -1,5 +1,5 @@
 import re
-import time
+from asyncio import sleep
 from datetime import date
 from logging import getLogger
 from random import randint
@@ -103,7 +103,7 @@ class YandexMetrikaClientAdapterAbstract(JSONAdapterMixin, TapiocaAdapter):
                     retry_seconds
                 )
                 logger.warning(big_report_request)
-                time.sleep(retry_seconds)
+                await sleep(retry_seconds)
                 return True
 
         if code == 429:
@@ -113,7 +113,7 @@ class YandexMetrikaClientAdapterAbstract(JSONAdapterMixin, TapiocaAdapter):
                     limit_errors["quota_requests_by_ip"], retry_seconds
                 )
                 logger.warning(error_text)
-                time.sleep(retry_seconds)
+                await sleep(retry_seconds)
                 return True
             else:
                 for err in errors_types:
@@ -121,8 +121,9 @@ class YandexMetrikaClientAdapterAbstract(JSONAdapterMixin, TapiocaAdapter):
 
         elif code == 503:
             if repeat_number <= api_params.get("retries_if_server_error", self.max_retries_requests):
-                logger.warning("Server error. Re-request after 3 seconds")
-                time.sleep(5)
+                retry_seconds = 5
+                logger.warning("Server error. Re-request after {} seconds".format(retry_seconds))
+                await sleep(retry_seconds)
                 return True
 
         return False
@@ -152,11 +153,11 @@ class YandexMetrikaManagementAPIClientAdapter(YandexMetrikaClientAdapterAbstract
             if offset2 > total_rows:
                 offset2 = total_rows
 
-            logger.debug(
-                "Exported lines {}-{}. Total rows {}".format(
-                    offset, offset2, total_rows
-                )
-            )
+            if total_rows > 0:
+                msg = "Exported lines {}-{}. Total rows {}".format(offset, offset2, total_rows)
+            else:
+                msg = "Exported lines 0. Total rows 0"
+            logger.debug(msg)
 
         return data
 
@@ -206,7 +207,6 @@ class YandexMetrikaReportsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
     async def process_response(self, response, **kwargs):
         data = await super().process_response(response, **kwargs)
         if isinstance(data, dict):
-            attribution = data["query"]["attribution"]
             sampled = data["sampled"]
             sample_share = data["sample_share"]
             total_rows = data["total_rows"]
@@ -218,10 +218,11 @@ class YandexMetrikaReportsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
 
             if sampled:
                 logger.debug("Sample: {}".format(sample_share))
-            logger.debug("Attribution: {}".format(attribution))
-            logger.debug(
-                "Exported lines {}-{}. Total rows {}".format(offset, offset2, total_rows)
-            )
+            if total_rows > 0:
+                msg = "Exported lines {}-{}. Total rows {}".format(offset, offset2, total_rows)
+            else:
+                msg = "Exported lines 0. Total rows 0"
+            logger.debug(msg)
 
         return data
 
@@ -308,7 +309,7 @@ class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
             sleep_time = repeat_number * 60
             sleep_time = sleep_time if sleep_time <= max_sleep else max_sleep
             logger.info("Wait report %s sec.", sleep_time)
-            time.sleep(sleep_time)
+            await sleep(sleep_time)
 
             return True
 
