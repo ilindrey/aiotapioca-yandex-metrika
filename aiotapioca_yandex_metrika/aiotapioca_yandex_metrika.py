@@ -4,9 +4,8 @@ from datetime import date
 from logging import getLogger
 from random import randint
 
-from aiotapioca.adapters import (
-    JSONAdapterMixin,
-    TapiocaAdapter,
+from aiotapioca import (
+    TapiocaAdapterJSON,
     generate_wrapper_from_adapter,
 )
 
@@ -30,18 +29,16 @@ logger = getLogger(__name__)
 LIMIT = 10000
 
 
-class YandexMetrikaClientAdapterAbstract(JSONAdapterMixin, TapiocaAdapter):
-    def get_api_root(self, api_params, **kwargs):
-        return "https://api-metrika.yandex.net/"
+class YandexMetrikaClientAdapterAbstract(TapiocaAdapterJSON):
+    api_root = "https://api-metrika.yandex.net/"
 
     def get_request_kwargs(self, *args, **kwargs):
         api_params = kwargs.get("api_params", {})
         if "receive_all_data" in api_params:
             raise BackwardCompatibilityError("parameter 'receive_all_data'")
         arguments = super().get_request_kwargs(*args, **kwargs)
-        arguments["headers"]["Authorization"] = "OAuth {}".format(
-            api_params["access_token"]
-        )
+        access_token = api_params.get('access_token', '')
+        arguments["headers"]["Authorization"] = f"OAuth {access_token}"
         return arguments
 
     def raise_response_error(self, message, data, response, **kwargs):

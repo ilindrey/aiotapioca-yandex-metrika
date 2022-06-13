@@ -1,16 +1,10 @@
-from aiotapioca.exceptions import ResponseProcessException
+from aiotapioca import ResponseProcessException, TapiocaException
 
 
 class YandexMetrikaApiError(ResponseProcessException):
 
     def __str__(self):
-        return "{} {} {}\nHEADERS = {}\nURL = {}".format(
-            self.response.status,
-            self.response.reason,
-            self.message,
-            self.response.headers,
-            self.response.url,
-        )
+        return f"{self.response.status} {self.response.reason} {self.message}\nHEADERS = {self.response.headers}\nURL = {self.response.url}"
 
 
 class YandexMetrikaClientError(YandexMetrikaApiError):
@@ -20,41 +14,37 @@ class YandexMetrikaClientError(YandexMetrikaApiError):
         self.errors = errors
 
     def __str__(self):
-        return "code={}, message={}, errors={}".format(
-            self.code, self.message, self.errors
-        )
-
+        return f"code={self.code}, message={self.message}, errors={self.errors}"
 
 class YandexMetrikaServerError(YandexMetrikaClientError):
+    
     pass
 
 
 class YandexMetrikaTokenError(YandexMetrikaClientError):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    
+    pass
 
 
 class YandexMetrikaLimitError(YandexMetrikaClientError):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    
+    pass
 
 
 class YandexMetrikaDownloadReportError(YandexMetrikaClientError):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
     def __str__(self):
         return self.message
 
 
-class BackwardCompatibilityError(Exception):
+class BackwardCompatibilityError(TapiocaException):
     def __init__(self, name):
         self.name = name
 
     def __str__(self):
         return (
-            "This {} is deprecated and not supported. "
+            f"This {self.name} is deprecated and not supported. "
             "Install a later version "
             "'pip install --upgrade async-tapi-yandex-metrika'. "
             "Info https://github.com/ilindrey/async-tapi-yandex-metrika"
-        ).format(self.name)
+        )
