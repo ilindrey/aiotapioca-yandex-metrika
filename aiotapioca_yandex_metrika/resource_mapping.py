@@ -1,5 +1,11 @@
 from .parsers import LogsAPIParser, ReportsAPIParser
 
+__all__ = (
+    'MANAGEMENT_API_RESOURCE_MAPPING',
+    'REPORTS_API_RESOURCE_MAPPING',
+    'LOGS_API_RESOURCE_MAPPING'
+)
+
 MANAGEMENT_API_RESOURCE_MAPPING = {
     "counters": {
         "resource": "management/v1/counters",

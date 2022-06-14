@@ -1,5 +1,15 @@
 from aiotapioca import ResponseProcessException, TapiocaException
 
+__all__ = (
+    'BackwardCompatibilityError',
+    'YandexMetrikaApiError',
+    'YandexMetrikaClientError',
+    'YandexMetrikaDownloadLogError',
+    'YandexMetrikaLimitError',
+    'YandexMetrikaServerError',
+    'YandexMetrikaTokenError'
+)
+
 
 class YandexMetrikaApiError(ResponseProcessException):
 

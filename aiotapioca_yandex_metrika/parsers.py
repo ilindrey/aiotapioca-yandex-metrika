@@ -1,5 +1,10 @@
 from io import StringIO
 
+__all__ = (
+    'ReportsAPIParser',
+    'LogsAPIParser'
+)
+
 
 class ReportsAPIParser:
 

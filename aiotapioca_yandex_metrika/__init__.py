@@ -7,3 +7,9 @@ from .aiotapioca_yandex_metrika import (
     YandexMetrikaManagementAPI,
     YandexMetrikaReportsAPI,
 )
+
+__all__ = (
+    'YandexMetrikaLogsAPI',
+    'YandexMetrikaManagementAPI',
+    'YandexMetrikaReportsAPI',
+)
