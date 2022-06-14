@@ -1,37 +1,36 @@
 from io import StringIO
 
-# Reports API
-
-
-def iter_transform_data(data):
-    for row in data["data"]:
-        dimensions_data = [i["name"] for i in row["dimensions"]]
-        metrics_data = row["metrics"]
-        yield dimensions_data + metrics_data
-
-
-def get_reports_headers(data):
-    return data["query"]["dimensions"] + data["query"]["metrics"]
-
 
 class ReportsAPIParser:
-    @staticmethod
-    def headers(data):
-        return get_reports_headers(data)
 
-    @staticmethod
-    def values(data):
-        return list(iter_transform_data(data))
+    @classmethod
+    def iter_transform_data(cls, data):
+        for row in data["data"]:
+            dimensions_data = [i["name"] for i in row["dimensions"]]
+            metrics_data = row["metrics"]
+            yield dimensions_data + metrics_data
 
-    @staticmethod
-    def dicts(data):
-        columns = get_reports_headers(data)
-        return [dict(zip(columns, row)) for row in iter_transform_data(data)]
+    @classmethod
+    def get_reports_headers(cls, data):
+        return data["query"]["dimensions"] + data["query"]["metrics"]
 
-    @staticmethod
-    def columns(data):
+    @classmethod
+    def headers(cls, data):
+        return cls.get_reports_headers(data)
+
+    @classmethod
+    def values(cls, data):
+        return list(cls.iter_transform_data(data))
+
+    @classmethod
+    def dicts(cls, data):
+        columns = cls.get_reports_headers(data)
+        return [dict(zip(columns, row)) for row in cls.iter_transform_data(data)]
+
+    @classmethod
+    def columns(cls, data):
         cols = None
-        for row in iter_transform_data(data):
+        for row in cls.iter_transform_data(data):
             if cols is None:
                 cols = [[] for _ in range(len(row))]
             for i, col in enumerate(cols):
@@ -39,44 +38,42 @@ class ReportsAPIParser:
         return cols
 
 
-# Logs API
-
-
-def iter_line(data):
-    f = StringIO(data)
-    next(f)  # skipping columns
-    return (line.replace("\n", "") for line in f)
-
-
-def get_logs_headers(data):
-    return data[: data.find("\n")].split("\t") if data else []
-
-
 class LogsAPIParser:
-    @staticmethod
-    def headers(data):
-        return get_logs_headers(data)
 
-    @staticmethod
-    def lines(data):
+    @classmethod
+    def iter_line(cls, data):
+        f = StringIO(data)
+        next(f)  # skipping columns
+        return (line.replace("\n", "") for line in f)
+
+    @classmethod
+    def get_logs_headers(cls, data):
+        return data[: data.find("\n")].split("\t") if data else []
+
+    @classmethod
+    def headers(cls, data):
+        return cls.get_logs_headers(data)
+
+    @classmethod
+    def lines(cls, data):
         return [line for line in data.split("\n")[1:] if line]
 
-    @staticmethod
-    def values(data):
+    @classmethod
+    def values(cls, data):
         return [line.split("\t") for line in data.split("\n")[1:] if line]
 
-    @staticmethod
-    def dicts(data):
+    @classmethod
+    def dicts(cls, data):
         return [
-            dict(zip(get_logs_headers(data), line.split("\t")))
+            dict(zip(cls.get_logs_headers(data), line.split("\t")))
             for line in data.split("\n")[1:]
             if line
         ]
 
-    @staticmethod
-    def columns(data):
-        cols = [[] for _ in range(len(get_logs_headers(data)))]
-        for line in iter_line(data):
+    @classmethod
+    def columns(cls, data):
+        cols = [[] for _ in range(len(cls.get_logs_headers(data)))]
+        for line in cls.iter_line(data):
             values = line.split("\t")
             for i, col in enumerate(cols):
                 col.append(values[i])
