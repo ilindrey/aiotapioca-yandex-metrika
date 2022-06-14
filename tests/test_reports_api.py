@@ -28,7 +28,7 @@ async def client():
 
 async def test_reports_data(mocked, client):
     mocked.get(
-        make_url(client.reports().data, url_params),
+        make_url(client.reports().path, url_params),
         body=REPORTS_DATA,
         status=200,
         content_type="application/json",
@@ -36,17 +36,17 @@ async def test_reports_data(mocked, client):
 
     response = await client.reports().get(params=url_params)
 
-    assert response().data == loads(REPORTS_DATA)
-    assert response.query.ids().data == [100500]
-    assert response.query.limit().data == 1
-    assert len(response.data().data) > 0
-    assert len(response.totals().data) > 0
-    assert response.totals().data[0] > 0
+    assert response.data() == loads(REPORTS_DATA)
+    assert response.data.query.ids() == [100500]
+    assert response.data.query.limit() == 1
+    assert len(response.data.data()) > 0
+    assert len(response.data.totals()) > 0
+    assert response.data.totals()[0] > 0
 
 
 async def test_transform(mocked, client):
     mocked.get(
-        make_url(client.reports().data, url_params),
+        make_url(client.reports().path, url_params),
         body=REPORTS_DATA,
         status=200,
         content_type="application/json",
@@ -56,21 +56,21 @@ async def test_transform(mocked, client):
 
     response_data = loads(REPORTS_DATA)
 
-    assert response().data == response_data
-    assert response().headers() == ["ym:s:date", "ym:s:visits"]
+    assert response.data() == response_data
+    assert response.data.headers() == ["ym:s:date", "ym:s:visits"]
 
-    assert response().values() == [
+    assert response.data.values() == [
         ["2020-10-01", 14234.0],
         ["2020-10-02", 12508.0],
         ["2020-10-03", 12365.0],
         ["2020-10-04", 14588.0],
         ["2020-10-05", 14579.0],
     ]
-    assert response().columns() == [
+    assert response.data.columns() == [
         ["2020-10-01", "2020-10-02", "2020-10-03", "2020-10-04", "2020-10-05"],
         [14234.0, 12508.0, 12365.0, 14588.0, 14579.0],
     ]
-    assert response().dicts() == [
+    assert response.data.dicts() == [
         {"ym:s:date": "2020-10-01", "ym:s:visits": 14234.0},
         {"ym:s:date": "2020-10-02", "ym:s:visits": 12508.0},
         {"ym:s:date": "2020-10-03", "ym:s:visits": 12365.0},
@@ -83,12 +83,12 @@ async def test_iteration(mocked, client):
 
     response_data = loads(REPORTS_DATA)
 
-    url_1 = make_url(client.reports().data, url_params)
+    url_1 = make_url(client.reports().path, url_params)
 
     url_2_params = dict(url_params)
     url_2_params["offset"] = url_params.get("offset", 1) + 1
 
-    url_2 = make_url(client.reports().data, url_2_params)
+    url_2 = make_url(client.reports().path, url_2_params)
 
     mocked.get(url_1, body=REPORTS_DATA, status=200, content_type="application/json")
     mocked.get(url_2, body=REPORTS_DATA, status=200, content_type="application/json")
@@ -99,22 +99,22 @@ async def test_iteration(mocked, client):
     max_pages = 1
     async for page in report().pages(max_pages=max_pages):
 
-        assert page().data == response_data
-        assert page().headers() == ["ym:s:date", "ym:s:visits"]
+        assert page.data() == response_data
+        assert page.data.headers() == ["ym:s:date", "ym:s:visits"]
 
-        for row in page().values():
+        for row in page.data.values():
             assert len(row) == 2
             assert isinstance(row, list)
             assert isinstance(row[0], str)
             assert isinstance(row[1], float)
 
-        for row in page().dicts():
+        for row in page.data.dicts():
             assert len(row) == 2
             assert isinstance(row, dict)
             assert isinstance(row["ym:s:date"], str)
             assert isinstance(row["ym:s:visits"], float)
 
-        for index, row in enumerate(page().columns()):
+        for index, row in enumerate(page.data.columns()):
             assert len(row) == 5
             assert isinstance(row, list)
             for item in row:

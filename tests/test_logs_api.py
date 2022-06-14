@@ -73,7 +73,7 @@ async def test_all_info(mocked, client, url_params_visits, url_params_hits):
     }
 
     mocked.get(
-        client.all_info().data,
+        client.all_info().path,
         body=dumps(response_data),
         status=200,
         content_type="application/json",
@@ -81,7 +81,7 @@ async def test_all_info(mocked, client, url_params_visits, url_params_hits):
 
     response = await client.all_info().get()
 
-    assert response().data == response_data
+    assert response.data() == response_data
 
 
 async def test_evaluate(mocked, client, url_params_visits):
@@ -94,17 +94,17 @@ async def test_evaluate(mocked, client, url_params_visits):
     }
 
     mocked.get(
-        make_url(client.evaluate().data, url_params_visits),
+        make_url(client.evaluate().path, url_params_visits),
         body=dumps(response_data),
         status=200,
         content_type="application/json",
     )
     response = await client.evaluate().get(params=url_params_visits)
 
-    assert "log_request_evaluation" in dir(response)
-    assert response().data == response_data
-    assert response.log_request_evaluation.possible().data is True
-    assert response.log_request_evaluation.max_possible_day_quantity().data == 7777777
+    assert "log_request_evaluation" in response.data
+    assert response.data() == response_data
+    assert response.data.log_request_evaluation.possible() is True
+    assert response.data.log_request_evaluation.max_possible_day_quantity() == 7777777
 
 
 async def test_create(mocked, client, url_params_visits):
@@ -121,18 +121,18 @@ async def test_create(mocked, client, url_params_visits):
         }
     }
     mocked.post(
-        make_url(client.create().data, url_params_visits),
+        make_url(client.create().path, url_params_visits),
         body=dumps(response_data),
         status=200,
         content_type="application/json",
     )
     response = await client.create().post(params=url_params_visits)
 
-    assert "log_request" in dir(response)
-    assert response.log_request.status().data == "created"
-    assert response.log_request.date1().data == url_params_visits["date1"]
-    assert response.log_request.date2().data == url_params_visits["date2"]
-    assert response().data == response_data
+    assert "log_request" in response.data
+    assert response.data.log_request.status() == "created"
+    assert response.data.log_request.date1() == url_params_visits["date1"]
+    assert response.data.log_request.date2() == url_params_visits["date2"]
+    assert response.data() == response_data
 
 
 async def test_info(mocked, client, url_params_visits):
@@ -151,16 +151,16 @@ async def test_info(mocked, client, url_params_visits):
         }
     }
     mocked.get(
-        client.info(requestId=12345678).data,
+        client.info(requestId=12345678).path,
         body=dumps(response_data),
         status=200,
         content_type="application/json",
     )
     response = await client.info(requestId=12345678).get()
 
-    assert "log_request" in dir(response)
-    assert response.log_request.counter_id().data == 100500
-    assert response.log_request.request_id().data == 12345678
+    assert "log_request" in response.data
+    assert response.data.log_request.counter_id() == 100500
+    assert response.data.log_request.request_id() == 12345678
 
 
 async def test_download(mocked, client):
@@ -173,7 +173,7 @@ async def test_download(mocked, client):
 
     log = await client.download(requestId=12345678).get()
     async for page in log().pages(max_pages=2):
-        assert page().data == LOGS_DATA
+        assert page.data() == LOGS_DATA
 
 
 async def test_clean(mocked, client, url_params_visits):
@@ -192,7 +192,7 @@ async def test_clean(mocked, client, url_params_visits):
         }
     }
     mocked.post(
-        client.clean(requestId=12345678).data,
+        client.clean(requestId=12345678).path,
         body=dumps(response_data),
         status=200,
         content_type="application/json",
@@ -200,10 +200,10 @@ async def test_clean(mocked, client, url_params_visits):
 
     response = await client.clean(requestId=12345678).post()
 
-    assert "log_request" in dir(response)
-    assert response.log_request.counter_id().data == 100500
-    assert response.log_request.request_id().data == 12345678
-    assert response.log_request.status().data == "cleaned_by_user"
+    assert "log_request" in response.data
+    assert response.data.log_request.counter_id() == 100500
+    assert response.data.log_request.request_id() == 12345678
+    assert response.data.log_request.status() == "cleaned_by_user"
 
 
 async def test_cancel(mocked, client, url_params_visits):
@@ -221,7 +221,7 @@ async def test_cancel(mocked, client, url_params_visits):
         }
     }
     mocked.post(
-        client.cancel(requestId=12345678).data,
+        client.cancel(requestId=12345678).path,
         body=dumps(response_data),
         status=200,
         content_type="application/json",
@@ -229,10 +229,10 @@ async def test_cancel(mocked, client, url_params_visits):
 
     response = await client.cancel(requestId=12345678).post()
 
-    assert "log_request" in dir(response)
-    assert response.log_request.counter_id().data == 100500
-    assert response.log_request.request_id().data == 12345678
-    assert response.log_request.status().data == "canceled"
+    assert "log_request" in response.data
+    assert response.data.log_request.counter_id() == 100500
+    assert response.data.log_request.request_id() == 12345678
+    assert response.data.log_request.status() == "canceled"
 
 
 async def test_transform(mocked, client):
@@ -245,28 +245,28 @@ async def test_transform(mocked, client):
 
     log = await client.download(requestId=0).get()
 
-    assert log().headers() == ["col1", "col2", "col3", "col4", "col5"]
+    assert log.data.headers() == ["col1", "col2", "col3", "col4", "col5"]
 
-    assert log().values() == [
+    assert log.data.values() == [
         ["val1", "val2", "val3", "val4", "val5"],
         ["val11", "val22", "val33", "val44", "val55"],
         ["val111", "val222", "val333", "val444", "val555"],
         ["val1111", "val2222", "val3333", "val4444", "val5555"],
     ]
-    assert log().lines() == [
+    assert log.data.lines() == [
         "val1\tval2\tval3\tval4\tval5",
         "val11\tval22\tval33\tval44\tval55",
         "val111\tval222\tval333\tval444\tval555",
         "val1111\tval2222\tval3333\tval4444\tval5555",
     ]
-    assert log().columns() == [
+    assert log.data.columns() == [
         ["val1", "val11", "val111", "val1111"],
         ["val2", "val22", "val222", "val2222"],
         ["val3", "val33", "val333", "val3333"],
         ["val4", "val44", "val444", "val4444"],
         ["val5", "val55", "val555", "val5555"],
     ]
-    assert log().dicts() == [
+    assert log.data.dicts() == [
         {
             "col1": "val1",
             "col2": "val2",
@@ -332,21 +332,21 @@ async def test_iteration(mocked, client):
 
     max_parts = 2
     async for part in log().pages(max_pages=max_parts):
-        assert len(part().lines()) == 4
-        assert len(part().values()) == 4
-        assert len(part().columns()) == 5
-        assert len(part().dicts()) == 4
+        assert len(part.data.lines()) == 4
+        assert len(part.data.values()) == 4
+        assert len(part.data.columns()) == 5
+        assert len(part.data.dicts()) == 4
 
-        assert part().headers() == ["col1", "col2", "col3", "col4", "col5"]
+        assert part.data.headers() == ["col1", "col2", "col3", "col4", "col5"]
 
-        for line, expected in zip(part().lines(), expected_lines):
+        for line, expected in zip(part.data.lines(), expected_lines):
             assert line == expected
 
-        for values, expected in zip(part().values(), expected_values):
+        for values, expected in zip(part.data.values(), expected_values):
             assert values == expected
 
-        for values, expected in zip(part().columns(), expected_columns):
+        for values, expected in zip(part.data.columns(), expected_columns):
             assert values == expected
 
-        for values, expected in zip(part().dicts(), expected_dicts):
+        for values, expected in zip(part.data.dicts(), expected_dicts):
             assert values == expected

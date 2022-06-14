@@ -19,7 +19,7 @@ async def test_methods_exists(client):
 
 async def test_get_counters(mocked, client):
     mocked.get(
-        client.counters().data + f"?per_page={LIMIT}",
+        client.counters().path + f"?per_page={LIMIT}",
         body=COUNTERS_DATA,
         status=200,
         content_type="application/json",
@@ -27,9 +27,9 @@ async def test_get_counters(mocked, client):
 
     response = await client.counters().get()
 
-    response_data = response().data
+    response_data = response.data()
 
-    assert response().status == 200
+    assert response.status == 200
     assert response_data["rows"] == 2
     assert len(response_data["counters"]) == 2
     assert response_data["counters"][0]["id"] == 12345678
@@ -40,7 +40,7 @@ async def test_get_counters(mocked, client):
 
 async def test_get_goals(mocked, client):
     mocked.get(
-        client.goals(counterId=12345648).data,
+        client.goals(counterId=12345648).path,
         body=GOALS_DATA,
         status=200,
         content_type="application/json",
@@ -48,9 +48,9 @@ async def test_get_goals(mocked, client):
 
     response = await client.goals(counterId=12345648).get()
 
-    response_data = response().data
+    response_data = response.data()
 
-    assert response().status == 200
+    assert response.status == 200
     assert len(response_data["goals"]) == 2
     assert response_data["goals"][0]["id"] == 1234567
     assert response_data["goals"][0]["name"] == "goal 1"
@@ -62,7 +62,7 @@ async def test_get_goal(mocked, client):
     params = {"counterId": 12345648, "goalId": 1234567}
 
     mocked.get(
-        client.goal(**params).data,
+        client.goal(**params).path,
         body=GOAL_DATA,
         status=200,
         content_type="application/json",
@@ -70,7 +70,7 @@ async def test_get_goal(mocked, client):
 
     response = await client.goal(**params).get()
 
-    response_data = response().data
+    response_data = response.data()
 
     assert isinstance(response_data["goal"], dict)
     assert response_data["goal"]["id"] == 1234567
