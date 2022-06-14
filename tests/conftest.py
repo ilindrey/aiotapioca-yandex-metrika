@@ -1,6 +1,5 @@
 import pytest
 from aioresponses import aioresponses
-
 from async_solipsism import EventLoop
 
 

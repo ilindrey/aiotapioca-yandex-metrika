@@ -9,7 +9,7 @@ from .aiotapioca_yandex_metrika import (
 )
 
 __all__ = (
-    'YandexMetrikaLogsAPI',
-    'YandexMetrikaManagementAPI',
-    'YandexMetrikaReportsAPI',
+    "YandexMetrikaLogsAPI",
+    "YandexMetrikaManagementAPI",
+    "YandexMetrikaReportsAPI",
 )

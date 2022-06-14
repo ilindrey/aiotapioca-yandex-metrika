@@ -4,10 +4,7 @@ from datetime import date
 from logging import getLogger
 from random import randint
 
-from aiotapioca import (
-    TapiocaAdapterJSON,
-    generate_wrapper_from_adapter,
-)
+from aiotapioca import TapiocaAdapterJSON, generate_wrapper_from_adapter
 
 from .exceptions import (
     BackwardCompatibilityError,
@@ -25,12 +22,12 @@ from .resource_mapping import (
 )
 
 __all__ = (
-    'YandexMetrikaLogsAPI',
-    'YandexMetrikaManagementAPI',
-    'YandexMetrikaReportsAPI',
-    'YandexMetrikaLogsAPIClientAdapter',
-    'YandexMetrikaManagementAPIClientAdapter',
-    'YandexMetrikaReportsAPIClientAdapter'
+    "YandexMetrikaLogsAPI",
+    "YandexMetrikaManagementAPI",
+    "YandexMetrikaReportsAPI",
+    "YandexMetrikaLogsAPIClientAdapter",
+    "YandexMetrikaManagementAPIClientAdapter",
+    "YandexMetrikaReportsAPIClientAdapter",
 )
 
 logger = getLogger(__name__)
@@ -47,20 +44,28 @@ class YandexMetrikaClientAdapterAbstract(TapiocaAdapterJSON):
         if "receive_all_data" in api_params:
             raise BackwardCompatibilityError("parameter 'receive_all_data'")
         arguments = super().get_request_kwargs(*args, **kwargs)
-        access_token = api_params.get('access_token', '')
+        access_token = api_params.get("access_token", "")
         arguments["headers"]["Authorization"] = f"OAuth {access_token}"
         return arguments
 
     def raise_response_error(self, message, data, response, **kwargs):
         if isinstance(message, dict):
             if response.status == 403:
-                raise YandexMetrikaTokenError(data=data, response=response, **message, **kwargs)
+                raise YandexMetrikaTokenError(
+                    data=data, response=response, **message, **kwargs
+                )
             elif response.status == 429:
-                raise YandexMetrikaLimitError(data=data, response=response, **message, **kwargs)
+                raise YandexMetrikaLimitError(
+                    data=data, response=response, **message, **kwargs
+                )
             elif 400 <= response.status < 500:
-                raise YandexMetrikaClientError(data=data, response=response, **message, **kwargs)
+                raise YandexMetrikaClientError(
+                    data=data, response=response, **message, **kwargs
+                )
             elif 500 <= response.status < 600:
-                raise YandexMetrikaServerError(data=data, response=response, **message, **kwargs)
+                raise YandexMetrikaServerError(
+                    data=data, response=response, **message, **kwargs
+                )
         else:
             raise YandexMetrikaApiError(message, data, response)
 
@@ -88,18 +93,12 @@ class YandexMetrikaClientAdapterAbstract(TapiocaAdapterJSON):
         errors_types = [i.get("error_type") for i in error_message.get("errors", [])]
 
         limit_errors = {
-            "quota_requests_by_uid":
-                "The limit on the number of API requests per day for the user has been exceeded.",
-            "quota_delegate_requests":
-                "Exceeded the limit on the number of API requests to add representatives per hour for a user.",
-            "quota_grants_requests":
-                "Exceeded the limit on the number of API requests to add access to the counter per hour",
-            "quota_requests_by_ip":
-                "The limit on the number of API requests per second for an IP address has been exceeded.",
-            "quota_parallel_requests":
-                "The limit on the number of parallel API requests per day for the user has been exceeded.",
-            "quota_requests_by_counter_id":
-                "The limit on the number of API requests per day for the counter has been exceeded.",
+            "quota_requests_by_uid": "The limit on the number of API requests per day for the user has been exceeded.",
+            "quota_delegate_requests": "Exceeded the limit on the number of API requests to add representatives per hour for a user.",
+            "quota_grants_requests": "Exceeded the limit on the number of API requests to add access to the counter per hour",
+            "quota_requests_by_ip": "The limit on the number of API requests per second for an IP address has been exceeded.",
+            "quota_parallel_requests": "The limit on the number of parallel API requests per day for the user has been exceeded.",
+            "quota_requests_by_counter_id": "The limit on the number of API requests per day for the counter has been exceeded.",
         }
         big_report_request = (
             "Query is too complicated. Please reduce the date interval or sampling."
@@ -125,9 +124,13 @@ class YandexMetrikaClientAdapterAbstract(TapiocaAdapterJSON):
                     logger.error(limit_errors[err])
 
         elif code == 503:
-            if repeat_number <= api_params.get("retries_if_server_error", self.max_retries_requests):
+            if repeat_number <= api_params.get(
+                "retries_if_server_error", self.max_retries_requests
+            ):
                 retry_seconds = 5
-                logger.warning(f"Server error. Re-request after {retry_seconds} seconds")
+                logger.warning(
+                    f"Server error. Re-request after {retry_seconds} seconds"
+                )
                 await sleep(retry_seconds)
                 return True
 
@@ -254,8 +257,13 @@ class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
                 # Fires when trying to download a non-existent part of a report.
                 return
 
-            if message_text == "Only log of requests in status 'processed' can be downloaded":
-                raise YandexMetrikaDownloadLogError(message=message, data=data, response=response, **kwargs)
+            if (
+                message_text
+                == "Only log of requests in status 'processed' can be downloaded"
+            ):
+                raise YandexMetrikaDownloadLogError(
+                    message=message, data=data, response=response, **kwargs
+                )
         super().raise_response_error(message, data, response, **kwargs)
 
     def fill_resource_template_url(self, template, url_params, **kwargs):

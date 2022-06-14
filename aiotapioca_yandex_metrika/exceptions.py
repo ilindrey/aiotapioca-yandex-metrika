@@ -1,18 +1,17 @@
 from aiotapioca import ResponseProcessException, TapiocaException
 
 __all__ = (
-    'BackwardCompatibilityError',
-    'YandexMetrikaApiError',
-    'YandexMetrikaClientError',
-    'YandexMetrikaDownloadLogError',
-    'YandexMetrikaLimitError',
-    'YandexMetrikaServerError',
-    'YandexMetrikaTokenError'
+    "BackwardCompatibilityError",
+    "YandexMetrikaApiError",
+    "YandexMetrikaClientError",
+    "YandexMetrikaDownloadLogError",
+    "YandexMetrikaLimitError",
+    "YandexMetrikaServerError",
+    "YandexMetrikaTokenError",
 )
 
 
 class YandexMetrikaApiError(ResponseProcessException):
-
     def __str__(self):
         return f"{self.response.status} {self.response.reason} {self.message}\nHEADERS = {self.response.headers}\nURL = {self.response.url}"
 
@@ -43,7 +42,6 @@ class YandexMetrikaLimitError(YandexMetrikaClientError):
 
 
 class YandexMetrikaDownloadLogError(YandexMetrikaClientError):
-
     def __str__(self):
         return self.message
 

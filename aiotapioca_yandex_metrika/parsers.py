@@ -1,13 +1,9 @@
 from io import StringIO
 
-__all__ = (
-    'ReportsAPIParser',
-    'LogsAPIParser'
-)
+__all__ = ("ReportsAPIParser", "LogsAPIParser")
 
 
 class ReportsAPIParser:
-
     @classmethod
     def iter_transform_data(cls, data):
         for row in data["data"]:
@@ -44,7 +40,6 @@ class ReportsAPIParser:
 
 
 class LogsAPIParser:
-
     @classmethod
     def iter_line(cls, data):
         f = StringIO(data)
