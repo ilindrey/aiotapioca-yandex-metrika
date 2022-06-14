@@ -272,11 +272,11 @@ class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
         if request_id is None:
             client = kwargs["client"]
             info = await client.info(requestId=request_id).get()
-            status = info().data["log_request"]["status"]
+            status = info.data()["log_request"]["status"]
             if status not in ("processed", "created"):
                 raise YandexMetrikaDownloadLogError(
                     message=f"Such status '{status}' of the report does not allow downloading it",
-                    response=info().response,
+                    response=info.response,
                 )
 
     async def retry_request(
