@@ -13,7 +13,7 @@ from .exceptions import (
     BackwardCompatibilityError,
     YandexMetrikaApiError,
     YandexMetrikaClientError,
-    YandexMetrikaDownloadReportError,
+    YandexMetrikaDownloadLogError,
     YandexMetrikaLimitError,
     YandexMetrikaServerError,
     YandexMetrikaTokenError,
@@ -245,7 +245,7 @@ class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
                 return
 
             if message_text == "Only log of requests in status 'processed' can be downloaded":
-                raise YandexMetrikaDownloadReportError(message=message, data=data, response=response, **kwargs)
+                raise YandexMetrikaDownloadLogError(message=message, data=data, response=response, **kwargs)
         super().raise_response_error(message, data, response, **kwargs)
 
     def fill_resource_template_url(self, template, url_params, **kwargs):
@@ -274,7 +274,7 @@ class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
             info = await client.info(requestId=request_id).get()
             status = info().data["log_request"]["status"]
             if status not in ("processed", "created"):
-                raise YandexMetrikaDownloadReportError(
+                raise YandexMetrikaDownloadLogError(
                     message=f"Such status '{status}' of the report does not allow downloading it",
                     response=info().response,
                 )

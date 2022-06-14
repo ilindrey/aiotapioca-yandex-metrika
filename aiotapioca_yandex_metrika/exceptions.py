@@ -32,7 +32,7 @@ class YandexMetrikaLimitError(YandexMetrikaClientError):
     pass
 
 
-class YandexMetrikaDownloadReportError(YandexMetrikaClientError):
+class YandexMetrikaDownloadLogError(YandexMetrikaClientError):
 
     def __str__(self):
         return self.message
