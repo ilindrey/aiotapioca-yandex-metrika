@@ -93,12 +93,18 @@ class YandexMetrikaClientAdapterAbstract(TapiocaAdapterJSON):
         errors_types = [i.get("error_type") for i in error_message.get("errors", [])]
 
         limit_errors = {
-            "quota_requests_by_uid": "The limit on the number of API requests per day for the user has been exceeded.",
-            "quota_delegate_requests": "Exceeded the limit on the number of API requests to add representatives per hour for a user.",
-            "quota_grants_requests": "Exceeded the limit on the number of API requests to add access to the counter per hour",
-            "quota_requests_by_ip": "The limit on the number of API requests per second for an IP address has been exceeded.",
-            "quota_parallel_requests": "The limit on the number of parallel API requests per day for the user has been exceeded.",
-            "quota_requests_by_counter_id": "The limit on the number of API requests per day for the counter has been exceeded.",
+            "quota_requests_by_uid":
+                "The limit on the number of API requests per day for the user has been exceeded.",
+            "quota_delegate_requests":
+                "Exceeded the limit on the number of API requests to add representatives per hour for a user.",
+            "quota_grants_requests":
+                "Exceeded the limit on the number of API requests to add access to the counter per hour",
+            "quota_requests_by_ip":
+                "The limit on the number of API requests per second for an IP address has been exceeded.",
+            "quota_parallel_requests":
+                "The limit on the number of parallel API requests per day for the user has been exceeded.",
+            "quota_requests_by_counter_id":
+                "The limit on the number of API requests per day for the counter has been exceeded.",
         }
         big_report_request = (
             "Query is too complicated. Please reduce the date interval or sampling."
