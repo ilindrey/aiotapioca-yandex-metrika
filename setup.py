@@ -18,6 +18,7 @@ test_requirements = [
     "pytest>=7.0",
     "pytest-asyncio>=0.18",
     "aioresponses>=0.7",
+    "async-solipsism>=0.5,<1.0",
 ]
 dev_requirements = [
     *test_requirements,
