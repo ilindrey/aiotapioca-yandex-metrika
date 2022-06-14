@@ -16,18 +16,19 @@ class YandexMetrikaClientError(YandexMetrikaApiError):
     def __str__(self):
         return f"code={self.code}, message={self.message}, errors={self.errors}"
 
+
 class YandexMetrikaServerError(YandexMetrikaClientError):
-    
+
     pass
 
 
 class YandexMetrikaTokenError(YandexMetrikaClientError):
-    
+
     pass
 
 
 class YandexMetrikaLimitError(YandexMetrikaClientError):
-    
+
     pass
 
 

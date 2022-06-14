@@ -60,6 +60,9 @@ class YandexMetrikaClientAdapterAbstract(TapiocaAdapterJSON):
         else:
             return []
 
+    def get_error_message(self, data, response=None, **kwargs):
+        return data
+
     async def retry_request(
         self,
         exception,
@@ -67,9 +70,8 @@ class YandexMetrikaClientAdapterAbstract(TapiocaAdapterJSON):
         **kwargs,
     ):
         api_params = kwargs["api_params"]
-        data = kwargs["data"]
         response = kwargs["response"]
-        error_message = self.get_error_message(data, response, **kwargs)
+        error_message = self.get_error_message(**kwargs)
 
         code = int(error_message.get("code", response.status))
         message = error_message.get("message", "")
@@ -96,9 +98,7 @@ class YandexMetrikaClientAdapterAbstract(TapiocaAdapterJSON):
         if code == 400:
             if message == big_report_request:
                 retry_seconds = randint(5, 30)
-                big_report_request += " Re-request after {} seconds".format(
-                    retry_seconds
-                )
+                big_report_request += f" Re-request after {retry_seconds} seconds"
                 logger.warning(big_report_request)
                 await sleep(retry_seconds)
                 return True
@@ -106,9 +106,7 @@ class YandexMetrikaClientAdapterAbstract(TapiocaAdapterJSON):
         if code == 429:
             if "quota_requests_by_ip" in errors_types:
                 retry_seconds = randint(1, 30)
-                error_text = "{} Re-request after {} seconds.".format(
-                    limit_errors["quota_requests_by_ip"], retry_seconds
-                )
+                error_text = f"{limit_errors['quota_requests_by_ip']} Re-request after {retry_seconds} seconds."
                 logger.warning(error_text)
                 await sleep(retry_seconds)
                 return True
@@ -119,7 +117,7 @@ class YandexMetrikaClientAdapterAbstract(TapiocaAdapterJSON):
         elif code == 503:
             if repeat_number <= api_params.get("retries_if_server_error", self.max_retries_requests):
                 retry_seconds = 5
-                logger.warning("Server error. Re-request after {} seconds".format(retry_seconds))
+                logger.warning(f"Server error. Re-request after {retry_seconds} seconds")
                 await sleep(retry_seconds)
                 return True
 
@@ -151,7 +149,7 @@ class YandexMetrikaManagementAPIClientAdapter(YandexMetrikaClientAdapterAbstract
                 offset2 = total_rows
 
             if total_rows > 0:
-                msg = "Exported lines {}-{}. Total rows {}".format(offset, offset2, total_rows)
+                msg = f"Exported lines {offset}-{offset2}. Total rows {total_rows}"
             else:
                 msg = "Exported lines 0. Total rows 0"
             logger.debug(msg)
@@ -214,9 +212,9 @@ class YandexMetrikaReportsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
                 offset2 = total_rows
 
             if sampled:
-                logger.debug("Sample: {}".format(sample_share))
+                logger.debug(f"Sample: {sample_share}")
             if total_rows > 0:
-                msg = "Exported lines {}-{}. Total rows {}".format(offset, offset2, total_rows)
+                msg = f"Exported lines {offset}-{offset2}. Total rows {total_rows}"
             else:
                 msg = "Exported lines 0. Total rows 0"
             logger.debug(msg)
@@ -266,7 +264,7 @@ class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
 
         part = int(re.findall(r"part/([0-9]*)/", url)[0])
         next_part = part + 1
-        new_url = re.sub(r"part/[0-9]*/", "part/{}/".format(next_part), url)
+        new_url = re.sub(r"part/[0-9]*/", f"part/{next_part}/", url)
         return {**request_kwargs, "url": new_url}
 
     async def _check_status_report(self, api_params, **kwargs):
