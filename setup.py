@@ -52,7 +52,7 @@ setup(
     license="MIT",
     zip_safe=False,
     keywords="aiotapioca,wrapper,yandex,metrika,api,async,asyncio",
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     install_requires=requirements,
     test_suite="tests",
     tests_require=test_requirements,
