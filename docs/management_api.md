@@ -9,6 +9,13 @@ from aiotapioca_yandex_metrika import YandexMetrikaManagementAPI
 ACCESS_TOKEN = ""
 COUNTER_ID = ""
 
+client = YandexMetrikaManagementAPI(
+    access_token=ACCESS_TOKEN,
+    default_url_params={'counterId': COUNTER_ID}
+)
+
+# or
+
 async with YandexMetrikaManagementAPI(
     access_token=ACCESS_TOKEN,
     default_url_params={'counterId': COUNTER_ID}
@@ -29,7 +36,7 @@ print(dir(client))
  'yclid_conversions_uploadings']
 
 # Open resource documentation in a browser
-client.counters().open_docs()
+client.counters.open_docs()
 ```
 
 How to send different types of HTTP requests
@@ -54,71 +61,74 @@ await client.counters().options(data: dict = None, params: dict = None)
 ```python
 from aiotapioca_yandex_metrika import YandexMetrikaManagementAPI
 
-async with YandexMetrikaManagementAPI(...) as client:
 
-    # Get counters. Via HTTP GET method.
-    counters = await client.counters().get()
-    async for page in counters().pages():
-        print(page().data)
+client =  YandexMetrikaManagementAPI(...)
 
-    # Get counters sorted by visit. Via HTTP GET method.
-    counters = await client.counters().get(params={"sort": "Visits"})
-    print(counters().data)
+# Get counters. Via HTTP GET method.
+counters = await client.counters().get()
 
-    # Create a goal. Via HTTP POST method.
-    body = {
-            "goal": {
-                "name": "2 страницы",
-                "type": "number",
-                "is_retargeting": 0,
-                "depth": 2
-            }
-        }
-    await client.goals().post(data=body)
+# Get counters sorted by visit. Via HTTP GET method.
+counters = await client.counters().get(params={"sort": "Visits"})
+print(counters.data())
 
-    # Create target on JavaScript event. Via HTTP POST method.
-    body2 = {
+# Get all counters
+counters = await client.counters().get()
+async for page in counters().pages():
+    print(page.data())
+
+# Create a goal. Via HTTP POST method.
+body = {
         "goal": {
-            "name": "Название вашей цели в метрике",
-            "type": "action",
+            "name": "2 страницы",
+            "type": "number",
             "is_retargeting": 0,
-            "conditions": [
-                    {
-                        "type": "exact",
-                        "url": <your_value>
-                    }
-                ]
-            }
-        }
-    await client.goals().post(data=body2)
-
-    # For some resources, you need to substitute the object identifier in the url.
-    # This is done by adding an identifier to the method itself.
-    # Get information about the target. Via HTTP GET method.
-    await client.goal(goalId=10000).get()
-
-    # Change target. Via HTTP PUT method.
-    body = {
-        "goal" : {
-            "id" : <int>,
-            "name" :  <string> ,
-            "type" :  <goal_type>,
-            "is_retargeting" :  <boolean>,
-            ...
+            "depth": 2
         }
     }
-    await client.goal(goalId=10000).put(data=body)
+await client.goals().post(data=body)
 
-    # Delete target. Via HTTP DELETE method.
-    await client.goal(goalId=10000).delete()
+# Create target on JavaScript event. Via HTTP POST method.
+body2 = {
+    "goal": {
+        "name": "Название вашей цели в метрике",
+        "type": "action",
+        "is_retargeting": 0,
+        "conditions": [
+                {
+                    "type": "exact",
+                    "url": <your_value>
+                }
+            ]
+        }
+    }
+await client.goals().post(data=body2)
+
+# For some resources, you need to substitute the object identifier in the url.
+# This is done by adding an identifier to the method itself.
+# Get information about the target. Via HTTP GET method.
+await client.goal(goalId=10000).get()
+
+# Change target. Via HTTP PUT method.
+body = {
+    "goal" : {
+        "id" : <int>,
+        "name" :  <string> ,
+        "type" :  <goal_type>,
+        "is_retargeting" :  <boolean>,
+        ...
+    }
+}
+await client.goal(goalId=10000).put(data=body)
+
+# Delete target. Via HTTP DELETE method.
+await client.goal(goalId=10000).delete()
 ```
 
 You can get information about the request.
 ```python
 counters = await client.counters().get()
-executor = counters()
-print(executor.data)
-print(executor.response)
-print(executor.response.headers)
-print(executor.status)
+print(counters.data())
+print(counters.response)
+print(counters.response.headers)
+print(counters.status)
 ```

@@ -15,72 +15,73 @@ params = {
     "date2": "2021-01-01"
     }
 
-async with YandexMetrikaLogsAPI(
+client = YandexMetrikaLogsAPI(
     access_token=ACCESS_TOKEN,
     default_url_params={'counterId': COUNTER_ID}
-    ) as client:
-    # Check the possibility of creating a report. Via HTTP GET method.
-    result = await client.evaluate().get(params=params)
-    print(result)
+    )
 
-    # Order a report. Via HTTP POST method.
-    result = await client.create().post(params=params)
-    request_id = result().data["log_request"]["request_id"]
-    print(result)
+# Check the possibility of creating a report. Via HTTP GET method.
+result = await client.evaluate().get(params=params)
+print(result)
 
-    # Cancel report creation. Via HTTP POST method.
-    result = await client.cancel(requestId=request_id).post()
-    print(result)
+# Order a report. Via HTTP POST method.
+result = await client.create().post(params=params)
+request_id = result.data()["log_request"]["request_id"]
+print(result)
 
-    # Delete report. Via HTTP POST method.
-    result = await client.clean(requestId=request_id).post()
-    print(result)
+# Cancel report creation. Via HTTP POST method.
+result = await client.cancel(requestId=request_id).post()
+print(result)
 
-    # Get information about all reports stored on the server. Via HTTP GET method.
-    result = await client.allinfo().get()
-    print(result)
+# Delete report. Via HTTP POST method.
+result = await client.clean(requestId=request_id).post()
+print(result)
 
-    # Get information about a specific report. Via HTTP GET method.
-    result = await client.info(requestId=request_id).get()
-    print(result)
+# Get information about all reports stored on the server. Via HTTP GET method.
+result = await client.allinfo().get()
+print(result)
 
-    # Download the report. Via HTTP POST method.
-    result = await client.create().post(params=params)
-    request_id = result["log_request"]["request_id"]
+# Get information about a specific report. Via HTTP GET method.
+result = await client.info(requestId=request_id).get()
+print(result)
 
-    # The report can be downloaded when it is generated on the server. Via HTTP GET method.
-    info = await client.info(requestId=request_id).get()
-    if info["log_request"]["status"] == "processed":
+# Download the report. Via HTTP POST method.
+result = await client.create().post(params=params)
+# Similarly result.data()["log_request"]["request_id"]
+request_id = result.data.log_request.request_id()
 
-        # The report can consist of several parts.
-        parts = info["log_request"]["parts"]
-        print("Number of parts in the report", parts)
+# The report can be downloaded when it is generated on the server. Via HTTP GET method.
+info = await client.info(requestId=request_id).get()
+info_data = info.data()
+if info_data["log_request"]["status"] == "processed":
 
-        # The partNumber parameter specifies the number of the part of the report that you want to download.
-        # Default partNumber=0
-        part = await client.download(requestId=request_id, partNumber=0).get()
+    # The report can consist of several parts.
+    parts = info_data["log_request"]["parts"]
+    print("Number of parts in the report", parts)
 
-        executor = part()
+    # The partNumber parameter specifies the number of the part of the report that you want to download.
+    # Default partNumber=0
+    part = await client.download(requestId=request_id, partNumber=0).get()
 
-        print("Raw data")
-        data = executor.data[:1000]
+    print("Raw data")
+    data = part.data()[:1000]
 
-        print("Column names")
-        print(executor.headers())
+    print("Column names")
+    print(part.data.headers())
 
-        # Transform to values
-        print(executor.values()[:3])
+    # Transform to values
+    print(part.data.values()[:3])
 
-        # Transform to lines
-        print(executor.lines()[:3])
+    # Transform to lines
+    print(part.data.lines()[:3])
 
-        # Transform to dicts
-        print(executor.dicts()[:3])
+    # Transform to dicts
+    print(part.data.dicts()[:3])
 
-        # Transform to columns
-        print(executor.columns()[:3])
-    else:
-        print("Report not ready yet")
+    # Transform to columns
+    print(part.data.columns()[:3])
+else:
+    print("Report not ready yet")
 ```
 
 ## Automatically download the report when it is prepared
@@ -99,36 +100,37 @@ params = {
     "date1": "2019-01-01",
     "date2": "2019-01-01"
     }
-async with YandexMetrikaLogsAPI(
+
+client = YandexMetrikaLogsAPI(
     access_token=ACCESS_TOKEN,
     default_url_params={'counterId': COUNTER_ID},
     # Download the report when it will be created
     wait_report=True,
-    ) as client:
-    info = await client.create().post(params=params)
-    request_id = info["log_request"]["request_id"]
+    )
 
-    report = await client.download(requestId=request_id).get()
 
-    executor = report()
+info = await client.create().post(params=params)
+request_id = info.data.log_request.request_id()
 
-    print("Raw data")
-    data = executor.data
+report = await client.download(requestId=request_id).get()
 
-    print("Column names")
-    print(executor.headers())
+print("Raw data")
+data = report.data()
 
-    # Transform to values
-    print(executor.values())
+print("Column names")
+print(report.data.headers())
 
-    # Transform to lines
-    print(executor.lines())
+# Transform to values
+print(report.data.values())
 
-    # Transform to dict
-    print(executor.dicts())
+# Transform to lines
+print(report.data.lines())
 
-    # Transform to columns
-    print(executor.columns())
+# Transform to dict
+print(report.data.dicts())
+
+# Transform to columns
+print(report.data.columns())
 ```
 
 ## Export of all report parts.
@@ -136,34 +138,34 @@ async with YandexMetrikaLogsAPI(
 ```python
 from aiotapioca_yandex_metrika import YandexMetrikaLogsAPI
 
-async with YandexMetrikaLogsAPI(...) as client:
-    info = await client.create().post(params=...)
-    request_id = info["log_request"]["request_id"]
-    report = await client.download(requestId=request_id).get()
+client =  YandexMetrikaLogsAPI(...)
 
-    print(report.columns)
+info = await client.create().post(params=...)
+request_id = info.data.log_request.request_id()
+report = await client.download(requestId=request_id).get()
 
-    # Iteration parts.
-    async for part in report().page():
-        executor = part()
-        print(executor.data)  # raw data
-        print(executor.values())
-        print(executor.lines())
-        print(executor.columns())  # columns data orient
-        print(executor.dicts())
+print(report.columns)
 
-    async for part in report().page():
-        # Iteration lines.
-        for row_as_text in part().lines():
-            print(row_as_text)
+# Iteration parts.
+async for part in report().page():
+    print(part.data())  # raw data
+    print(part.data.values())
+    print(part.data.lines())
+    print(part.data.columns())  # columns data orient
+    print(part.data.dicts())
 
-        # Iteration values.
-        for row_as_values in part().values():
-            print(row_as_values)
+async for part in report().page():
+    # Iteration lines.
+    for row_as_text in part.data.lines():
+        print(row_as_text)
 
-        # Iteration dicts.
-        for row_as_dict in part().dicts():
-            print(row_as_dict)
+    # Iteration values.
+    for row_as_values in part.data.values():
+        print(row_as_values)
+
+    # Iteration dicts.
+    for row_as_dict in part.data.dicts():
+        print(row_as_dict)
 
 
 ```
@@ -178,22 +180,21 @@ async with YandexMetrikaLogsAPI(...) as client:
 
 from aiotapioca_yandex_metrika import YandexMetrikaLogsAPI
 
-async with YandexMetrikaLogsAPI(...) as client:
-    info = await client.create().post(params=...)
+client =  YandexMetrikaLogsAPI(...)
 
-    executor = info()
-    print(executor.data)
-    print(executor.response)
-    print(executor.response.headers)
-    print(executor.status)
+info = await client.create().post(params=...)
 
-    report = await client.download(requestId=info["log_request"]["request_id"]).get()
-    async for part in report().pages():
-        executor = part()
-        print(executor.data)
-        print(executor.response)
-        print(executor.response.headers)
-        print(executor.response.status)
+print(info.data())
+print(info.response)
+print(info.response.headers)
+print(info.status)
+
+report = await client.download(requestId=info["log_request"]["request_id"]).get()
+async for part in report().pages():
+    print(part.data())
+    print(part.response)
+    print(part.response.headers)
+    print(part.response.status)
 ```
 
 ## Warning

@@ -30,7 +30,7 @@ It's an asynchronous fork of [tapi-yandex-metrika](https://github.com/pavelmaksi
 ## Author
 Pavel Maksimov
 
-Good luck friend! Put an asterisk;)
+Good luck friend! Star the repo ;)
 
 Удачи тебе, друг! Поставь звездочку ;)
 
