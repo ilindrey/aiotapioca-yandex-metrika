@@ -13,7 +13,7 @@ with open("README.md", "r", encoding="utf8") as fh:
 
 package = "aiotapioca_yandex_metrika"
 
-requirements = ["aiohttp>=3.0", "aiotapioca-wrapper>=4.0.0", "orjson>=3.0.0"]
+requirements = ["aiohttp>=3.0", "aiotapioca-wrapper>=4.0.1", "orjson>=3.0.0"]
 test_requirements = [
     "pytest>=7.0",
     "pytest-asyncio>=0.18",
@@ -43,7 +43,7 @@ setup(
     description="Python client for API Yandex Metrika",
     long_description=readme,
     long_description_content_type="text/markdown",
-    author="Pavel Maksimov",
+    author="Pavel Maksimov, Andrey Ilin",
     author_email="vur21@ya.ru",
     url="https://github.com/ilindrey/aiotapioca-yandex-metrika",
     packages=[package],

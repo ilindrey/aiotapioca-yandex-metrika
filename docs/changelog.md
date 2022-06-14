@@ -1,9 +1,17 @@
 
 # CHANGELOG
 
+## Release 2022.6.15
+
+- Drop support Python 3.6 and below
+- Updated aiotapioca-wrapper library to version 4.0.0. Drop support aiotapioca-wrapper 3.8.0 and below
+- Renamed YandexMetrikaDownloadReportError -> YandexMetrikaDownloadLogError
+- Reworked exception handling v.2
+- Minor fixes
+
 ## Release 2022.5.16
 
-- Updated aiotapioca-wrapper library to version 3.8.0
+- Updated aiotapioca-wrapper library to version 3.8.0. Drop support aiotapioca-wrapper 3.7.0 and below
 - Added generic change log file
 - Added YandexMetrikaServerError
 - Added conversion of date1 and date2 to a string in the appropriate format
@@ -16,7 +24,7 @@
 
 ## Release 2022.4.23
 
-- Updated aiotapioca-wrapper library to version 3.6.0
+- Updated aiotapioca-wrapper library to version 3.6.0. Drop support aiotapioca-wrapper 3.5.0 and below
 
 ## Release 2022.4.13
 
