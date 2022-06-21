@@ -1,6 +1,6 @@
 __author__ = "Pavel Maksimov, Andrey Ilin"
 __email__ = "andreyilin@fastmail.com"
-__version__ = "2022.6.15"
+__version__ = "2022.6.22"
 
 from .aiotapioca_yandex_metrika import (
     YandexMetrikaLogsAPI,

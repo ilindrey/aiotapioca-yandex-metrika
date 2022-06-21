@@ -1,6 +1,10 @@
 
 # CHANGELOG
 
+## Release 2022.6.22
+
+- Added a py.typed merker for type hints
+
 ## Release 2022.6.15
 
 - Drop support Python 3.6 and below
