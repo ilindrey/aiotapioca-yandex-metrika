@@ -12,12 +12,8 @@ class ReportsAPIParser:
             yield dimensions_data + metrics_data
 
     @classmethod
-    def _get_headers(cls, data):
-        return data["query"]["dimensions"] + data["query"]["metrics"]
-
-    @classmethod
     def headers(cls, data):
-        return cls._get_headers(data)
+        return data["query"]["dimensions"] + data["query"]["metrics"]
 
     @classmethod
     def values(cls, data):
@@ -25,7 +21,7 @@ class ReportsAPIParser:
 
     @classmethod
     def dicts(cls, data):
-        columns = cls._get_headers(data)
+        columns = cls.headers(data)
         return [dict(zip(columns, row)) for row in cls._iter_transform_data(data)]
 
     @classmethod
@@ -47,12 +43,8 @@ class LogsAPIParser:
         return (line.replace("\n", "") for line in f)
 
     @classmethod
-    def _get_headers(cls, data):
-        return data[: data.find("\n")].split("\t") if data else []
-
-    @classmethod
     def headers(cls, data):
-        return cls._get_headers(data)
+        return data[: data.find("\n")].split("\t") if data else []
 
     @classmethod
     def lines(cls, data):
@@ -65,14 +57,14 @@ class LogsAPIParser:
     @classmethod
     def dicts(cls, data):
         return [
-            dict(zip(cls._get_headers(data), line.split("\t")))
+            dict(zip(cls.headers(data), line.split("\t")))
             for line in data.split("\n")[1:]
             if line
         ]
 
     @classmethod
     def columns(cls, data):
-        cols = [[] for _ in range(len(cls._get_headers(data)))]
+        cols = [[] for _ in range(len(cls.headers(data)))]
         for line in cls._iter_line(data):
             values = line.split("\t")
             for i, col in enumerate(cols):

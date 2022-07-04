@@ -118,7 +118,7 @@ class YandexMetrikaClientAdapterAbstract(TapiocaAdapterJSON):
                 await sleep(retry_seconds)
                 return True
 
-        if code == 429:
+        elif code == 429:
             if "quota_requests_by_ip" in errors_types:
                 retry_seconds = randint(1, 30)
                 error_text = f"{limit_errors['quota_requests_by_ip']} Re-request after {retry_seconds} seconds."
