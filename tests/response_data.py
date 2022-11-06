@@ -1,4 +1,4 @@
-from orjson import dumps
+from json import dumps
 
 COUNTERS_DATA = dumps(
     {
