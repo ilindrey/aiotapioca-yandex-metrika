@@ -1,7 +1,7 @@
 from datetime import date
 
 import pytest_asyncio
-from orjson import loads
+from json import loads
 from response_data import REPORTS_DATA
 from utils import make_url
 

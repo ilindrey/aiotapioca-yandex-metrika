@@ -2,7 +2,7 @@ from io import StringIO
 
 import pytest
 import pytest_asyncio
-from orjson import dumps
+from json import dumps
 from response_data import LOGS_DATA
 from utils import make_url
 

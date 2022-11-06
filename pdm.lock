@@ -43,6 +43,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "async-solipsism"
+version = "0.5"
+requires_python = ">=3.6"
+summary = "Asyncio event loop that doesn't interact with the outside world"
+
+[[package]]
 name = "async-timeout"
 version = "4.0.2"
 requires_python = ">=3.6"
@@ -215,6 +221,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "setuptools"
+version = "65.5.1"
+requires_python = ">=3.7"
+summary = "Easily download, build, install, upgrade, and uninstall Python packages"
+
+[[package]]
 name = "tomli"
 version = "2.0.1"
 requires_python = ">=3.7"
@@ -251,7 +263,7 @@ summary = "Backport of pathlib-compatible object wrapper for zip files"
 
 [metadata]
 lock_version = "4.0"
-content_hash = "sha256:7cb1c0ca13d3a1def30c89ed9f9795919489d682ecc692556748d3fb537016b5"
+content_hash = "sha256:6fe84d8b7365dc16cca08922ba3a908de9484824513780b344fc34bcb6c0cdfa"
 
 [metadata.files]
 "aiohttp 3.8.3" = [
@@ -354,6 +366,10 @@ content_hash = "sha256:7cb1c0ca13d3a1def30c89ed9f9795919489d682ecc692556748d3fb5
 "aiotapioca-wrapper 4.2.0" = [
     {url = "https://files.pythonhosted.org/packages/ab/e9/d82491f56994345934bdbe7af00a27af306eea0d22c37dc17b7416dcbf21/aiotapioca_wrapper-4.2.0-py3-none-any.whl", hash = "sha256:84674695069e3ee5d4dc8b45f4248bac5f7464779e6cbdca3f8e18fe6a1aa177"},
     {url = "https://files.pythonhosted.org/packages/cd/79/74909fdb0997ff3a6d34c7646db87adbd0de9b79e491cb5fd95d0a3f215b/aiotapioca-wrapper-4.2.0.tar.gz", hash = "sha256:b3df0783a85626d39160342ba7d44bc4c13b4a6a47bef13319968519534ae3b9"},
+]
+"async-solipsism 0.5" = [
+    {url = "https://files.pythonhosted.org/packages/17/00/b5d6e1a2240e9e1572246b5f203e1a7573e3f738d70fcf63160e9ac4434f/async-solipsism-0.5.tar.gz", hash = "sha256:a0d82f212b97d5ad73e253ad76d305196744c51412ece30c851401ac55ea63da"},
+    {url = "https://files.pythonhosted.org/packages/7d/f7/79741f60d537dd33473f98a6b2c6deeb4b70cecdc84aa9193863d945c045/async_solipsism-0.5-py3-none-any.whl", hash = "sha256:281905d69ce7c30677c27e66503e5c0316433ec3b3285fa7da8f6badb6d52477"},
 ]
 "async-timeout 4.0.2" = [
     {url = "https://files.pythonhosted.org/packages/54/6e/9678f7b2993537452710ffb1750c62d2c26df438aa621ad5fa9d1507a43a/async-timeout-4.0.2.tar.gz", hash = "sha256:2163e1640ddb52b7a8c80d0a67a08587e5d245cc9c553a74a847056bc2976b15"},
@@ -622,6 +638,10 @@ content_hash = "sha256:7cb1c0ca13d3a1def30c89ed9f9795919489d682ecc692556748d3fb5
 "pytest-cov 4.0.0" = [
     {url = "https://files.pythonhosted.org/packages/ea/70/da97fd5f6270c7d2ce07559a19e5bf36a76f0af21500256f005a69d9beba/pytest-cov-4.0.0.tar.gz", hash = "sha256:996b79efde6433cdbd0088872dbc5fb3ed7fe1578b68cdbba634f14bb8dd0470"},
     {url = "https://files.pythonhosted.org/packages/fe/1f/9ec0ddd33bd2b37d6ec50bb39155bca4fe7085fa78b3b434c05459a860e3/pytest_cov-4.0.0-py3-none-any.whl", hash = "sha256:2feb1b751d66a8bd934e5edfa2e961d11309dc37b73b0eabe73b5945fee20f6b"},
+]
+"setuptools 65.5.1" = [
+    {url = "https://files.pythonhosted.org/packages/26/f4/ca5cb6df512f453ad50f78900bf7ec6a5491ee44bb49d0f6f76802dbdd43/setuptools-65.5.1.tar.gz", hash = "sha256:e197a19aa8ec9722928f2206f8de752def0e4c9fc6953527360d1c36d94ddb2f"},
+    {url = "https://files.pythonhosted.org/packages/b6/40/353c051f77ee5618adaf1fd96f4f6bae9714ed0a22c7142c01c24eb77fe4/setuptools-65.5.1-py3-none-any.whl", hash = "sha256:d0b9a8433464d5800cbe05094acf5c6d52a91bfac9b52bcfc4d41382be5d5d31"},
 ]
 "tomli 2.0.1" = [
     {url = "https://files.pythonhosted.org/packages/97/75/10a9ebee3fd790d20926a90a2547f0bf78f371b2f13aa822c759680ca7b9/tomli-2.0.1-py3-none-any.whl", hash = "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc"},

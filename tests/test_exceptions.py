@@ -1,6 +1,6 @@
 import pytest
 import pytest_asyncio
-from orjson import dumps
+from json import dumps
 from response_data import COUNTERS_DATA
 
 from aiotapioca_yandex_metrika import YandexMetrikaLogsAPI, YandexMetrikaManagementAPI
