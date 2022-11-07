@@ -33,7 +33,7 @@ def url_params_hits():
 async def client():
     default_params = {
         "access_token": "token",
-        "default_url_params": {"counterId": 100500},
+        "default_url_params": {"counter_id": 100500},
         "wait_report": True,
     }
     async with YandexMetrikaLogsAPI(**default_params) as c:
@@ -149,12 +149,12 @@ async def test_info(mocked, client, url_params_visits):
         }
     }
     mocked.get(
-        client.info(requestId=12345678).path,
+        client.info(request_id=12345678).path,
         body=dumps(response_data),
         status=200,
         content_type="application/json",
     )
-    response = await client.info(requestId=12345678).get()
+    response = await client.info(request_id=12345678).get()
 
     assert "log_request" in response.data
     assert response.data.log_request.counter_id() == 100500
@@ -177,7 +177,7 @@ async def test_download(mocked, client):
     mocked.get(url_1, body=LOGS_DATA, status=200)
     mocked.get(url_2, body=LOGS_DATA, status=200)
 
-    log = await client.download(requestId=12345678).get()
+    log = await client.download(request_id=12345678).get()
     async for page in log().pages(max_pages=2):
         assert page.data() == LOGS_DATA
 
@@ -198,13 +198,13 @@ async def test_clean(mocked, client, url_params_visits):
         }
     }
     mocked.post(
-        client.clean(requestId=12345678).path,
+        client.clean(request_id=12345678).path,
         body=dumps(response_data),
         status=200,
         content_type="application/json",
     )
 
-    response = await client.clean(requestId=12345678).post()
+    response = await client.clean(request_id=12345678).post()
 
     assert "log_request" in response.data
     assert response.data.log_request.counter_id() == 100500
@@ -227,13 +227,13 @@ async def test_cancel(mocked, client, url_params_visits):
         }
     }
     mocked.post(
-        client.cancel(requestId=12345678).path,
+        client.cancel(request_id=12345678).path,
         body=dumps(response_data),
         status=200,
         content_type="application/json",
     )
 
-    response = await client.cancel(requestId=12345678).post()
+    response = await client.cancel(request_id=12345678).post()
 
     assert "log_request" in response.data
     assert response.data.log_request.counter_id() == 100500
@@ -249,7 +249,7 @@ async def test_transform(mocked, client):
         content_type="application/json",
     )
 
-    log = await client.download(requestId=0).get()
+    log = await client.download(request_id=0).get()
 
     assert log.data.headers() == ["col1", "col2", "col3", "col4", "col5"]
 
@@ -336,7 +336,7 @@ async def test_iteration(mocked, client):
     mocked.get(url_1, body=LOGS_DATA, status=200)
     mocked.get(url_2, body=LOGS_DATA, status=200)
 
-    log = await client.download(requestId=0).get()
+    log = await client.download(request_id=0).get()
 
     max_parts = 2
     async for part in log().pages(max_pages=max_parts):

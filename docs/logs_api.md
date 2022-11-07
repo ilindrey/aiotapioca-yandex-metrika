@@ -17,7 +17,7 @@ params = {
 
 client = YandexMetrikaLogsAPI(
     access_token=ACCESS_TOKEN,
-    default_url_params={'counterId': COUNTER_ID}
+    default_url_params={'counter_id': COUNTER_ID}
     )
 
 # Check the possibility of creating a report. Via HTTP GET method.
@@ -30,11 +30,11 @@ request_id = result.data()["log_request"]["request_id"]
 print(result)
 
 # Cancel report creation. Via HTTP POST method.
-result = await client.cancel(requestId=request_id).post()
+result = await client.cancel(request_id=request_id).post()
 print(result)
 
 # Delete report. Via HTTP POST method.
-result = await client.clean(requestId=request_id).post()
+result = await client.clean(request_id=request_id).post()
 print(result)
 
 # Get information about all reports stored on the server. Via HTTP GET method.
@@ -42,7 +42,7 @@ result = await client.allinfo().get()
 print(result)
 
 # Get information about a specific report. Via HTTP GET method.
-result = await client.info(requestId=request_id).get()
+result = await client.info(request_id=request_id).get()
 print(result)
 
 # Download the report. Via HTTP POST method.
@@ -51,7 +51,7 @@ result = await client.create().post(params=params)
 request_id = result.data.log_request.request_id()
 
 # The report can be downloaded when it is generated on the server. Via HTTP GET method.
-info = await client.info(requestId=request_id).get()
+info = await client.info(request_id=request_id).get()
 info_data = info.data()
 if info_data["log_request"]["status"] == "processed":
 
@@ -59,9 +59,9 @@ if info_data["log_request"]["status"] == "processed":
     parts = info_data["log_request"]["parts"]
     print("Number of parts in the report", parts)
 
-    # The partNumber parameter specifies the number of the part of the report that you want to download.
-    # Default partNumber=0
-    part = await client.download(requestId=request_id, partNumber=0).get()
+    # The part_number parameter specifies the number of the part of the report that you want to download.
+    # Default part_number=0
+    part = await client.download(request_id=request_id, part_number=0).get()
 
     print("Raw data")
     data = part.data()[:1000]
@@ -103,7 +103,7 @@ params = {
 
 client = YandexMetrikaLogsAPI(
     access_token=ACCESS_TOKEN,
-    default_url_params={'counterId': COUNTER_ID},
+    default_url_params={'counter_id': COUNTER_ID},
     # Download the report when it will be created
     wait_report=True,
     )
@@ -112,7 +112,7 @@ client = YandexMetrikaLogsAPI(
 info = await client.create().post(params=params)
 request_id = info.data.log_request.request_id()
 
-report = await client.download(requestId=request_id).get()
+report = await client.download(request_id=request_id).get()
 
 print("Raw data")
 data = report.data()
@@ -142,7 +142,7 @@ client =  YandexMetrikaLogsAPI(...)
 
 info = await client.create().post(params=...)
 request_id = info.data.log_request.request_id()
-report = await client.download(requestId=request_id).get()
+report = await client.download(request_id=request_id).get()
 
 print(report.columns)
 
@@ -189,7 +189,7 @@ print(info.response)
 print(info.response.headers)
 print(info.status)
 
-report = await client.download(requestId=info["log_request"]["request_id"]).get()
+report = await client.download(request_id=info["log_request"]["request_id"]).get()
 async for part in report().pages():
     print(part.data())
     print(part.response)

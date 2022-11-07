@@ -40,13 +40,13 @@ async def test_get_counters(mocked, client):
 
 async def test_get_goals(mocked, client):
     mocked.get(
-        client.goals(counterId=12345648).path,
+        client.goals(counter_id=12345648).path,
         body=GOALS_DATA,
         status=200,
         content_type="application/json",
     )
 
-    response = await client.goals(counterId=12345648).get()
+    response = await client.goals(counter_id=12345648).get()
 
     response_data = response.data()
 
@@ -59,7 +59,7 @@ async def test_get_goals(mocked, client):
 
 
 async def test_get_goal(mocked, client):
-    params = {"counterId": 12345648, "goalId": 1234567}
+    params = {"counter_id": 12345648, "goal_id": 1234567}
 
     mocked.get(
         client.goal(**params).path,

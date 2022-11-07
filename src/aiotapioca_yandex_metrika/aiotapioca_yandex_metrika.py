@@ -248,8 +248,8 @@ class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
 
     def fill_resource_template_url(self, template, url_params, **kwargs):
         resource = kwargs.get("resource")
-        if "download" in resource["resource"] and not url_params.get("partNumber"):
-            url_params.update(partNumber=0)
+        if "download" in resource["resource"] and not url_params.get("part_number"):
+            url_params.update(part_number=0)
         return super().fill_resource_template_url(template, url_params, **kwargs)
 
     def get_iterator_next_request_kwargs(self, request_kwargs, data, response, **kwargs):
@@ -264,10 +264,10 @@ class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
         return {**request_kwargs, "url": new_url}
 
     async def _check_status_report(self, api_params, **kwargs):
-        request_id = api_params["default_url_params"].get("requestId")
+        request_id = api_params["default_url_params"].get("request_id")
         if request_id is None:
             client = kwargs["client"]
-            info = await client.info(requestId=request_id).get()
+            info = await client.info(request_id=request_id).get()
             status = info.data()["log_request"]["status"]
             if status not in ("processed", "created"):
                 raise YandexMetrikaDownloadLogError(

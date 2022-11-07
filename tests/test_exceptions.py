@@ -189,7 +189,7 @@ async def test_adapter_raises_response_process_download_log_error(mocked):
     counter_id = 100500
     default_params = {
         "access_token": "token",
-        "default_url_params": {"counterId": 100500},
+        "default_url_params": {"counter_id": 100500},
         "wait_report": True,
     }
     client = YandexMetrikaLogsAPI(**default_params)
@@ -215,7 +215,7 @@ async def test_adapter_raises_response_process_download_log_error(mocked):
     )
 
     with pytest.raises(YandexMetrikaDownloadLogError):
-        await client.download(requestId=request_id).get()
+        await client.download(request_id=request_id).get()
 
     mocked.get(
         url,
@@ -226,11 +226,11 @@ async def test_adapter_raises_response_process_download_log_error(mocked):
 
     for _ in range(retry_count):
         mocked.get(
-            client.info(requestId=request_id).path,
+            client.info(request_id=request_id).path,
             body=dumps(response_body),
             status=200,
             content_type="application/json",
         )
 
     with pytest.raises(YandexMetrikaDownloadLogError):
-        await client.download(requestId=request_id).get()
+        await client.download(request_id=request_id).get()

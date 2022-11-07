@@ -11,14 +11,14 @@ COUNTER_ID = ""
 
 client = YandexMetrikaManagementAPI(
     access_token=ACCESS_TOKEN,
-    default_url_params={'counterId': COUNTER_ID}
+    default_url_params={'counter_id': COUNTER_ID}
 )
 
 # or
 
 async with YandexMetrikaManagementAPI(
     access_token=ACCESS_TOKEN,
-    default_url_params={'counterId': COUNTER_ID}
+    default_url_params={'counter_id': COUNTER_ID}
 ) as client:
 ```
 
@@ -106,7 +106,7 @@ await client.goals().post(data=body2)
 # For some resources, you need to substitute the object identifier in the url.
 # This is done by adding an identifier to the method itself.
 # Get information about the target. Via HTTP GET method.
-await client.goal(goalId=10000).get()
+await client.goal(goal_id=10000).get()
 
 # Change target. Via HTTP PUT method.
 body = {
@@ -118,10 +118,10 @@ body = {
         ...
     }
 }
-await client.goal(goalId=10000).put(data=body)
+await client.goal(goal_id=10000).put(data=body)
 
 # Delete target. Via HTTP DELETE method.
-await client.goal(goalId=10000).delete()
+await client.goal(goal_id=10000).delete()
 ```
 
 You can get information about the request.
