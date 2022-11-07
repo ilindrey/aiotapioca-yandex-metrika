@@ -1,3 +1,12 @@
+Release 2022.11.7
+-----------------
+
+- Rename query parameters passed to functions to lower case with an underscore
+- Removed dependency orjson
+- Replaced setup.py to pyproject.toml
+- Migrate to PDM
+- Minor fixes
+
 Release 2022.6.22
 -----------------
 
