@@ -1,4 +1,6 @@
+# flake8: noqa
 from .parsers import LogsAPIParser, ReportsAPIParser
+
 
 __all__ = (
     "MANAGEMENT_API_RESOURCE_MAPPING",

@@ -1,9 +1,0 @@
-version: "3"
-
-services:
-  aiotapioca_yandex_metrika:
-    build:
-      context: .
-    volumes:
-      - ./:/app/
-    tty: true

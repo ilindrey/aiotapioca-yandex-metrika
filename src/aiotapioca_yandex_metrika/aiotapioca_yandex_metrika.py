@@ -21,6 +21,7 @@ from .resource_mapping import (
     REPORTS_API_RESOURCE_MAPPING,
 )
 
+
 __all__ = (
     "YandexMetrikaLogsAPI",
     "YandexMetrikaManagementAPI",
@@ -51,21 +52,13 @@ class YandexMetrikaClientAdapterAbstract(TapiocaAdapterJSON):
     def raise_response_error(self, message, data, response, **kwargs):
         if isinstance(message, dict):
             if response.status == 403:
-                raise YandexMetrikaTokenError(
-                    data=data, response=response, **message, **kwargs
-                )
+                raise YandexMetrikaTokenError(data=data, response=response, **message, **kwargs)
             elif response.status == 429:
-                raise YandexMetrikaLimitError(
-                    data=data, response=response, **message, **kwargs
-                )
+                raise YandexMetrikaLimitError(data=data, response=response, **message, **kwargs)
             elif 400 <= response.status < 500:
-                raise YandexMetrikaClientError(
-                    data=data, response=response, **message, **kwargs
-                )
+                raise YandexMetrikaClientError(data=data, response=response, **message, **kwargs)
             elif 500 <= response.status < 600:
-                raise YandexMetrikaServerError(
-                    data=data, response=response, **message, **kwargs
-                )
+                raise YandexMetrikaServerError(data=data, response=response, **message, **kwargs)
         else:
             raise YandexMetrikaApiError(message, data, response)
 
@@ -87,25 +80,16 @@ class YandexMetrikaClientAdapterAbstract(TapiocaAdapterJSON):
         api_params = kwargs["api_params"]
         response = kwargs["response"]
         error_message = self.get_error_message(**kwargs)
+        errors = error_message.get("errors", [])
 
         code = int(error_message.get("code", response.status))
         message = error_message.get("message", "")
-        errors_types = [i.get("error_type") for i in error_message.get("errors", [])]
+        errors_types = [i.get("error_type") for i in errors]
 
-        limit_errors = {
-            "quota_requests_by_uid":
-                "The limit on the number of API requests per day for the user has been exceeded.",
-            "quota_delegate_requests":
-                "Exceeded the limit on the number of API requests to add representatives per hour for a user.",
-            "quota_grants_requests":
-                "Exceeded the limit on the number of API requests to add access to the counter per hour",
-            "quota_requests_by_ip":
-                "The limit on the number of API requests per second for an IP address has been exceeded.",
-            "quota_parallel_requests":
-                "The limit on the number of parallel API requests per day for the user has been exceeded.",
-            "quota_requests_by_counter_id":
-                "The limit on the number of API requests per day for the counter has been exceeded.",
-        }
+        quota_requests_by_ip = (
+            "The limit on the number of API requests per second for "
+            "an IP address has been exceeded."
+        )
         big_report_request = (
             "Query is too complicated. Please reduce the date interval or sampling."
         )
@@ -113,32 +97,29 @@ class YandexMetrikaClientAdapterAbstract(TapiocaAdapterJSON):
         if code == 400:
             if message == big_report_request:
                 retry_seconds = randint(5, 30)
-                big_report_request += f" Re-request after {retry_seconds} seconds"
-                logger.warning(big_report_request)
+                logger.warning("%s Re-request after %s seconds", big_report_request, retry_seconds)
                 await sleep(retry_seconds)
                 return True
 
         elif code == 429:
             if "quota_requests_by_ip" in errors_types:
                 retry_seconds = randint(1, 30)
-                error_text = f"{limit_errors['quota_requests_by_ip']} Re-request after {retry_seconds} seconds."
-                logger.warning(error_text)
-                await sleep(retry_seconds)
-                return True
-            else:
-                for err in errors_types:
-                    logger.error(limit_errors[err])
-
-        elif code == 503:
-            if repeat_number <= api_params.get(
-                "retries_if_server_error", self.max_retries_requests
-            ):
-                retry_seconds = 5
                 logger.warning(
-                    f"Server error. Re-request after {retry_seconds} seconds"
+                    "%s Re-request after %s seconds.", quota_requests_by_ip, retry_seconds
                 )
                 await sleep(retry_seconds)
                 return True
+            else:
+                for error in errors:
+                    logger.error("%s | %s | %s", code, error["error_type"], error["message"])
+
+        elif code == 503 and repeat_number <= api_params.get(
+            "retries_if_server_error", self.max_retries_requests
+        ):
+            retry_seconds = 5
+            logger.warning("Server error. Re-request after %s seconds", retry_seconds)
+            await sleep(retry_seconds)
+            return True
 
         return False
 
@@ -175,9 +156,7 @@ class YandexMetrikaManagementAPIClientAdapter(YandexMetrikaClientAdapterAbstract
 
         return data
 
-    def get_iterator_next_request_kwargs(
-        self, request_kwargs, data, response, **kwargs
-    ):
+    def get_iterator_next_request_kwargs(self, request_kwargs, data, response, **kwargs):
         if self.resource_mapping["counters"] == kwargs["resource"]:
             total_rows = data["rows"] if isinstance(data, dict) else 0
             per_page = int(response.url.query.get("per_page", LIMIT))
@@ -231,18 +210,16 @@ class YandexMetrikaReportsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
                 offset2 = total_rows
 
             if sampled:
-                logger.debug(f"Sample: {sample_share}")
+                logger.debug("Sample: %s", sample_share)
             if total_rows > 0:
-                msg = f"Exported lines {offset}-{offset2}. Total rows {total_rows}"
+                logger.debug("Exported lines %s-%s. Total rows %s", offset, offset2, total_rows)
             else:
                 msg = "Exported lines 0. Total rows 0"
-            logger.debug(msg)
+                logger.debug(msg)
 
         return data
 
-    def get_iterator_next_request_kwargs(
-        self, request_kwargs, data, response, **kwargs
-    ):
+    def get_iterator_next_request_kwargs(self, request_kwargs, data, response, **kwargs):
         total_rows = data["total_rows"]
         limit = int(response.url.query.get("limit", LIMIT))
         offset = int(response.url.query.get("offset", 1)) + limit
@@ -263,10 +240,7 @@ class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
                 # Fires when trying to download a non-existent part of a report.
                 return
 
-            if (
-                message_text
-                == "Only log of requests in status 'processed' can be downloaded"
-            ):
+            if message_text == "Only log of requests in status 'processed' can be downloaded":
                 raise YandexMetrikaDownloadLogError(
                     message=message, data=data, response=response, **kwargs
                 )
@@ -278,9 +252,7 @@ class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
             url_params.update(partNumber=0)
         return super().fill_resource_template_url(template, url_params, **kwargs)
 
-    def get_iterator_next_request_kwargs(
-        self, request_kwargs, data, response, **kwargs
-    ):
+    def get_iterator_next_request_kwargs(self, request_kwargs, data, response, **kwargs):
         url = request_kwargs["url"]
 
         if "download" not in url:
@@ -339,10 +311,6 @@ class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
         )
 
 
-YandexMetrikaReportsAPI = generate_wrapper_from_adapter(
-    YandexMetrikaReportsAPIClientAdapter
-)
-YandexMetrikaManagementAPI = generate_wrapper_from_adapter(
-    YandexMetrikaManagementAPIClientAdapter
-)
+YandexMetrikaReportsAPI = generate_wrapper_from_adapter(YandexMetrikaReportsAPIClientAdapter)
+YandexMetrikaManagementAPI = generate_wrapper_from_adapter(YandexMetrikaManagementAPIClientAdapter)
 YandexMetrikaLogsAPI = generate_wrapper_from_adapter(YandexMetrikaLogsAPIClientAdapter)

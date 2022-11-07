@@ -1,5 +1,6 @@
 from json import dumps
 
+
 COUNTERS_DATA = dumps(
     {
         "rows": 2,

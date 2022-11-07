@@ -1,9 +1,10 @@
 from io import StringIO
 
+
 __all__ = ("ReportsAPIParser", "LogsAPIParser")
 
 
-class ReportsAPIParser:
+class ReportsAPIParser:  # noqa: PIE798
     @classmethod
     def _iter_transform_data(cls, data):
         for row in data["data"]:
@@ -35,12 +36,12 @@ class ReportsAPIParser:
         return cols
 
 
-class LogsAPIParser:
+class LogsAPIParser:  # noqa: PIE798
     @classmethod
     def _iter_line(cls, data):
-        f = StringIO(data)
-        next(f)  # skipping columns
-        return (line.replace("\n", "") for line in f)
+        lines = StringIO(data)
+        next(lines)  # skipping columns
+        return (line.replace("\n", "") for line in lines)
 
     @classmethod
     def headers(cls, data):
@@ -57,9 +58,7 @@ class LogsAPIParser:
     @classmethod
     def dicts(cls, data):
         return [
-            dict(zip(cls.headers(data), line.split("\t")))
-            for line in data.split("\n")[1:]
-            if line
+            dict(zip(cls.headers(data), line.split("\t"))) for line in data.split("\n")[1:] if line
         ]
 
     @classmethod

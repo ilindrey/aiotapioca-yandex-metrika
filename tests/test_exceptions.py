@@ -1,6 +1,7 @@
+from json import dumps
+
 import pytest
 import pytest_asyncio
-from json import dumps
 from response_data import COUNTERS_DATA
 
 from aiotapioca_yandex_metrika import YandexMetrikaLogsAPI, YandexMetrikaManagementAPI
@@ -185,20 +186,24 @@ async def test_adapter_raises_response_process_backward_compatibility_exception(
 
 async def test_adapter_raises_response_process_download_log_error(mocked):
 
-    default_params = dict(
-        access_token="token",
-        default_url_params={"counterId": 100500},
-        wait_report=True,
-    )
+    counter_id = 100500
+    default_params = {
+        "access_token": "token",
+        "default_url_params": {"counterId": 100500},
+        "wait_report": True,
+    }
     client = YandexMetrikaLogsAPI(**default_params)
 
     retry_count = client._api.max_retries_requests + 1
 
-    requestId = 12345678
+    request_id = 12345678
     code = 400
     error_type = "invalid_parameter"
-    url = "https://api-metrika.yandex.net/management/v1/counter/100500/logrequest/12345678/part/0/download"
-    message = f"Only log of requests in status 'processed' can be downloaded"
+    url = (
+        "https://api-metrika.yandex.net/management/v1/counter/"
+        f"{counter_id}/logrequest/{request_id}/part/0/download"
+    )
+    message = "Only log of requests in status 'processed' can be downloaded"
 
     response_body, message, errors = get_response_body(code, error_type, message)
 
@@ -210,7 +215,7 @@ async def test_adapter_raises_response_process_download_log_error(mocked):
     )
 
     with pytest.raises(YandexMetrikaDownloadLogError):
-        await client.download(requestId=requestId).get()
+        await client.download(requestId=request_id).get()
 
     mocked.get(
         url,
@@ -221,11 +226,11 @@ async def test_adapter_raises_response_process_download_log_error(mocked):
 
     for _ in range(retry_count):
         mocked.get(
-            client.info(requestId=requestId).path,
+            client.info(requestId=request_id).path,
             body=dumps(response_body),
             status=200,
             content_type="application/json",
         )
 
     with pytest.raises(YandexMetrikaDownloadLogError):
-        await client.download(requestId=requestId).get()
+        await client.download(requestId=request_id).get()

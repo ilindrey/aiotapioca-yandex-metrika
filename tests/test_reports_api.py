@@ -1,23 +1,24 @@
 from datetime import date
+from json import loads
 
 import pytest_asyncio
-from json import loads
 from response_data import REPORTS_DATA
 from utils import make_url
 
 from aiotapioca_yandex_metrika import YandexMetrikaReportsAPI
 
-url_params = dict(
-    ids=100500,
-    metrics="ym:s:visits",
-    dimensions="ym:s:date",
-    sort="ym:s:date",
-    filters="ym:s:startURL=.('https://rfgf.ru/map','https://rfgf.ru/map')",
-    group="Day",
-    date1=date(2022, 10, 1),
-    date2=date(2022, 10, 5),
-    limit=1,
-)
+
+url_params = {
+    "ids": 100500,
+    "metrics": "ym:s:visits",
+    "dimensions": "ym:s:date",
+    "sort": "ym:s:date",
+    "filters": "ym:s:startURL=.('https://rfgf.ru/map','https://rfgf.ru/map')",
+    "group": "Day",
+    "date1": date(2022, 10, 1),
+    "date2": date(2022, 10, 5),
+    "limit": 1,
+}
 
 
 @pytest_asyncio.fixture

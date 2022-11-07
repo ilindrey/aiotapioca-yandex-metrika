@@ -6,5 +6,7 @@ inline-quotes = double
 extend-ignore =
     # E203: Whitespace before ':' (pycqa/pycodestyle#373)
     E203,
+    # S311: Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+    S311,
 per-file-ignores =
     tests/*: S101,S105,S106,S301,S403

@@ -8,4 +8,4 @@ def make_url(url, url_params):
             params["fields"] = url_params["fields"]
         else:
             params["fields"] = ",".join(url_params["fields"])
-    return "{}?{}".format(url, urlencode(params))
+    return f"{url}?{urlencode(params)}"

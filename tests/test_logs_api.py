@@ -1,8 +1,8 @@
 from io import StringIO
+from json import dumps
 
 import pytest
 import pytest_asyncio
-from json import dumps
 from response_data import LOGS_DATA
 from utils import make_url
 
@@ -11,33 +11,31 @@ from aiotapioca_yandex_metrika import YandexMetrikaLogsAPI
 
 @pytest.fixture
 def url_params_visits():
-    params = {
+    return {
         "fields": ["ym:s:date"],
         "source": "visits",
         "date1": "2020-12-01",
         "date2": "2020-12-02",
     }
-    return params
 
 
 @pytest.fixture
 def url_params_hits():
-    params = {
+    return {
         "fields": ["ym:pv:date"],
         "source": "hits",
         "date1": "2020-12-01",
         "date2": "2020-12-02",
     }
-    return params
 
 
 @pytest_asyncio.fixture
 async def client():
-    default_params = dict(
-        access_token="token",
-        default_url_params={"counterId": 100500},
-        wait_report=True,
-    )
+    default_params = {
+        "access_token": "token",
+        "default_url_params": {"counterId": 100500},
+        "wait_report": True,
+    }
     async with YandexMetrikaLogsAPI(**default_params) as c:
         yield c
 
@@ -164,9 +162,17 @@ async def test_info(mocked, client, url_params_visits):
 
 
 async def test_download(mocked, client):
+    counter_id = 100500
+    request_id = 12345678
 
-    url_1 = "https://api-metrika.yandex.net/management/v1/counter/100500/logrequest/12345678/part/0/download"
-    url_2 = "https://api-metrika.yandex.net/management/v1/counter/100500/logrequest/12345678/part/1/download"
+    url_1 = (
+        "https://api-metrika.yandex.net/management/v1/counter/"
+        f"{counter_id}/logrequest/{request_id}/part/0/download"
+    )
+    url_2 = (
+        "https://api-metrika.yandex.net/management/v1/counter/"
+        f"{counter_id}/logrequest/{request_id}/part/1/download"
+    )
 
     mocked.get(url_1, body=LOGS_DATA, status=200)
     mocked.get(url_2, body=LOGS_DATA, status=200)
@@ -303,27 +309,29 @@ async def test_iteration(mocked, client):
     columns = LOGS_DATA.split("\n")[0].split("\t")
 
     def _iter_line(text):
-        f = StringIO(text)
-        next(f)  # skipping columns
-        return (line.replace("\n", "") for line in f)
+        lines = StringIO(text)
+        next(lines)  # skipping columns
+        return (line.replace("\n", "") for line in lines)
 
     def to_columns(data):
-        c = [[] for _ in range(len(columns))]
+        cols = [[] for _ in range(len(columns))]
         for line in _iter_line(data):
             values = line.split("\t")
-            for i, col in enumerate(c):
+            for i, col in enumerate(cols):
                 col.append(values[i])
-        return c
+        return cols
 
     expected_lines = LOGS_DATA.split("\n")[1:]
     expected_values = [i.split("\t") for i in LOGS_DATA.split("\n")[1:]]
     expected_columns = to_columns(LOGS_DATA)
-    expected_dicts = [
-        dict(zip(columns, i.split("\t"))) for i in LOGS_DATA.split("\n")[1:]
-    ]
+    expected_dicts = [dict(zip(columns, i.split("\t"))) for i in LOGS_DATA.split("\n")[1:]]
 
-    url_1 = "https://api-metrika.yandex.net/management/v1/counter/100500/logrequest/0/part/0/download"
-    url_2 = "https://api-metrika.yandex.net/management/v1/counter/100500/logrequest/0/part/1/download"
+    url_1 = (
+        "https://api-metrika.yandex.net/management/v1/counter/100500/logrequest/0/part/0/download"
+    )
+    url_2 = (
+        "https://api-metrika.yandex.net/management/v1/counter/100500/logrequest/0/part/1/download"
+    )
 
     mocked.get(url_1, body=LOGS_DATA, status=200)
     mocked.get(url_2, body=LOGS_DATA, status=200)

@@ -1,6 +1,6 @@
 import pytest
 from aioresponses import aioresponses
-from async_solipsism import EventLoop
+from async_solipsism import EventLoop  # type: ignore
 
 
 @pytest.fixture
