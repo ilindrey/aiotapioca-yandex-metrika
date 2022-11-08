@@ -5,7 +5,6 @@ import pytest_asyncio
 from response_data import COUNTERS_DATA
 
 from aiotapioca_yandex_metrika import YandexMetrikaLogsAPI, YandexMetrikaManagementAPI
-from aiotapioca_yandex_metrika.aiotapioca_yandex_metrika import LIMIT
 from aiotapioca_yandex_metrika.exceptions import (
     BackwardCompatibilityError,
     YandexMetrikaApiError,
@@ -37,7 +36,7 @@ async def test_adapter_raises_response_process_exception_on_403s(mocked, client)
     response_body, message, errors = get_response_body(code, error_type)
 
     mocked.get(
-        client.counters().path + f"?per_page={LIMIT}",
+        client.counters().path + f"?per_page={client._api.default_per_page_limit}",
         body=dumps(response_body),
         status=code,
         content_type="application/json",
@@ -57,7 +56,7 @@ async def test_adapter_raises_response_process_exception_on_429s(mocked, client)
     response_body, message, errors = get_response_body(code, error_type)
 
     mocked.get(
-        client.counters().path + f"?per_page={LIMIT}",
+        client.counters().path + f"?per_page={client._api.default_per_page_limit}",
         body=dumps(response_body),
         status=code,
         content_type="application/json",
@@ -71,7 +70,7 @@ async def test_adapter_raises_response_process_exception_on_429s(mocked, client)
 
     for _ in range(retry_count):
         mocked.get(
-            client.counters().path + f"?per_page={LIMIT}",
+            client.counters().path + f"?per_page={client._api.default_per_page_limit}",
             body=dumps(response_body),
             status=code,
             content_type="application/json",
@@ -91,7 +90,7 @@ async def test_adapter_raises_response_process_exception_on_400s(mocked, client)
     response_body, message, errors = get_response_body(code, error_type)
 
     mocked.get(
-        client.counters().path + f"?per_page={LIMIT}",
+        client.counters().path + f"?per_page={client._api.default_per_page_limit}",
         body=dumps(response_body),
         status=code,
         content_type="application/json",
@@ -108,7 +107,7 @@ async def test_adapter_raises_response_process_exception_on_400s(mocked, client)
 
     for _ in range(retry_count):
         mocked.get(
-            client.counters().path + f"?per_page={LIMIT}",
+            client.counters().path + f"?per_page={client._api.default_per_page_limit}",
             body=dumps(response_body),
             status=code,
             content_type="application/json",
@@ -129,7 +128,7 @@ async def test_adapter_raises_response_process_exception_on_503s(mocked, client)
 
     for _ in range(retry_count):
         mocked.get(
-            client.counters().path + f"?per_page={LIMIT}",
+            client.counters().path + f"?per_page={client._api.default_per_page_limit}",
             body=dumps(response_body),
             status=code,
             content_type="application/json",
@@ -147,7 +146,7 @@ async def test_adapter_raises_response_process_exception_on_504s(mocked, client)
     response_body, message, errors = get_response_body(code, error_type)
 
     mocked.get(
-        client.counters().path + f"?per_page={LIMIT}",
+        client.counters().path + f"?per_page={client._api.default_per_page_limit}",
         body=dumps(response_body),
         status=code,
         content_type="application/json",
@@ -160,7 +159,7 @@ async def test_adapter_raises_response_process_exception_on_504s(mocked, client)
 async def test_adapter_raises_response_process_common_exception(mocked, client):
 
     mocked.get(
-        client.counters().path + f"?per_page={LIMIT}",
+        client.counters().path + f"?per_page={client._api.default_per_page_limit}",
         body="{}",
         status=504,
         content_type="application/json",
@@ -174,7 +173,7 @@ async def test_adapter_raises_response_process_backward_compatibility_exception(
     client = YandexMetrikaManagementAPI(receive_all_data=True)
 
     mocked.get(
-        client.counters().path + f"?per_page={LIMIT}",
+        client.counters().path + f"?per_page={client._api.default_per_page_limit}",
         body=COUNTERS_DATA,
         status=200,
         content_type="application/json",

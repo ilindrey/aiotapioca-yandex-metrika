@@ -2,7 +2,6 @@ import pytest_asyncio
 from response_data import COUNTERS_DATA, GOAL_DATA, GOALS_DATA
 
 from aiotapioca_yandex_metrika import YandexMetrikaManagementAPI
-from aiotapioca_yandex_metrika.aiotapioca_yandex_metrika import LIMIT
 
 
 @pytest_asyncio.fixture
@@ -19,7 +18,7 @@ async def test_methods_exists(client):
 
 async def test_get_counters(mocked, client):
     mocked.get(
-        client.counters().path + f"?per_page={LIMIT}",
+        client.counters().path + f"?per_page={client._api.default_per_page_limit}",
         body=COUNTERS_DATA,
         status=200,
         content_type="application/json",
