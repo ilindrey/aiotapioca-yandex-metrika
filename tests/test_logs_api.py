@@ -324,13 +324,17 @@ async def test_iteration(mocked, client):
     expected_lines = LOGS_DATA.split("\n")[1:]
     expected_values = [i.split("\t") for i in LOGS_DATA.split("\n")[1:]]
     expected_columns = to_columns(LOGS_DATA)
-    expected_dicts = [dict(zip(columns, i.split("\t"))) for i in LOGS_DATA.split("\n")[1:]]
+    expected_dicts = [
+        dict(zip(columns, i.split("\t"))) for i in LOGS_DATA.split("\n")[1:]
+    ]
 
     url_1 = (
-        "https://api-metrika.yandex.net/management/v1/counter/100500/logrequest/0/part/0/download"
+        "https://api-metrika.yandex.net/management/v1/"
+        "counter/100500/logrequest/0/part/0/download"
     )
     url_2 = (
-        "https://api-metrika.yandex.net/management/v1/counter/100500/logrequest/0/part/1/download"
+        "https://api-metrika.yandex.net/management/v1/"
+        "counter/100500/logrequest/0/part/1/download"
     )
 
     mocked.get(url_1, body=LOGS_DATA, status=200)

@@ -58,7 +58,9 @@ class LogsAPIParser:  # noqa: PIE798
     @classmethod
     def dicts(cls, data):
         return [
-            dict(zip(cls.headers(data), line.split("\t"))) for line in data.split("\n")[1:] if line
+            dict(zip(cls.headers(data), line.split("\t")))
+            for line in data.split("\n")[1:]
+            if line
         ]
 
     @classmethod

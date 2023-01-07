@@ -50,13 +50,21 @@ class YandexMetrikaClientAdapterAbstract(TapiocaAdapterJSON):
     def raise_response_error(self, message, data, response, **kwargs):
         if isinstance(message, dict):
             if response.status == 403:
-                raise YandexMetrikaTokenError(data=data, response=response, **message, **kwargs)
+                raise YandexMetrikaTokenError(
+                    data=data, response=response, **message, **kwargs
+                )
             elif response.status == 429:
-                raise YandexMetrikaLimitError(data=data, response=response, **message, **kwargs)
+                raise YandexMetrikaLimitError(
+                    data=data, response=response, **message, **kwargs
+                )
             elif 400 <= response.status < 500:
-                raise YandexMetrikaClientError(data=data, response=response, **message, **kwargs)
+                raise YandexMetrikaClientError(
+                    data=data, response=response, **message, **kwargs
+                )
             elif 500 <= response.status < 600:
-                raise YandexMetrikaServerError(data=data, response=response, **message, **kwargs)
+                raise YandexMetrikaServerError(
+                    data=data, response=response, **message, **kwargs
+                )
         else:
             raise YandexMetrikaApiError(message, data, response)
 
@@ -89,7 +97,9 @@ class YandexMetrikaClientAdapterAbstract(TapiocaAdapterJSON):
             )
             if message == big_report_request:
                 retry_seconds = randint(5, 30)
-                logger.warning("%s Re-request after %s seconds", big_report_request, retry_seconds)
+                logger.warning(
+                    "%s Re-request after %s seconds", big_report_request, retry_seconds
+                )
                 await sleep(retry_seconds)
                 return True
 
@@ -101,13 +111,17 @@ class YandexMetrikaClientAdapterAbstract(TapiocaAdapterJSON):
                     "an IP address has been exceeded."
                 )
                 logger.warning(
-                    "%s Re-request after %s seconds.", quota_requests_by_ip, retry_seconds
+                    "%s Re-request after %s seconds.",
+                    quota_requests_by_ip,
+                    retry_seconds,
                 )
                 await sleep(retry_seconds)
                 return True
             else:
                 for error in errors:
-                    logger.error("[%s] %s | %s", code, error["error_type"], error["message"])
+                    logger.error(
+                        "[%s] %s | %s", code, error["error_type"], error["message"]
+                    )
 
         elif code == 503 and repeat_number <= api_params.get(
             "retries_if_server_error", self.max_retries_requests
@@ -138,7 +152,9 @@ class YandexMetrikaManagementAPIClientAdapter(YandexMetrikaClientAdapterAbstract
 
         if self.resource_mapping["counters"] == kwargs["resource"]:
             total_rows = data["rows"] if isinstance(data, dict) else 0
-            per_page = int(response.url.query.get("per_page", self.default_per_page_limit))
+            per_page = int(
+                response.url.query.get("per_page", self.default_per_page_limit)
+            )
             offset = int(response.url.query.get("offset", 1)) + per_page
             offset2 = offset + per_page - 1
 
@@ -146,16 +162,22 @@ class YandexMetrikaManagementAPIClientAdapter(YandexMetrikaClientAdapterAbstract
                 offset2 = total_rows
 
             if total_rows > 0:
-                logger.debug("Exported lines %s-%s. Total rows %s", offset, offset2, total_rows)
+                logger.debug(
+                    "Exported lines %s-%s. Total rows %s", offset, offset2, total_rows
+                )
             else:
                 logger.debug("Exported lines 0. Total rows 0")
 
         return data
 
-    def get_iterator_next_request_kwargs(self, request_kwargs, data, response, **kwargs):
+    def get_iterator_next_request_kwargs(
+        self, request_kwargs, data, response, **kwargs
+    ):
         if self.resource_mapping["counters"] == kwargs["resource"]:
             total_rows = data["rows"] if isinstance(data, dict) else 0
-            per_page = int(response.url.query.get("per_page", self.default_per_page_limit))
+            per_page = int(
+                response.url.query.get("per_page", self.default_per_page_limit)
+            )
             offset = int(response.url.query.get("offset", 1)) + per_page
 
             if offset <= total_rows:
@@ -210,13 +232,17 @@ class YandexMetrikaReportsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
                 logger.debug("Sample: %s", sample_share)
 
             if total_rows > 0:
-                logger.debug("Exported lines %s-%s. Total rows %s", offset, offset2, total_rows)
+                logger.debug(
+                    "Exported lines %s-%s. Total rows %s", offset, offset2, total_rows
+                )
             else:
                 logger.debug("Exported lines 0. Total rows 0")
 
         return data
 
-    def get_iterator_next_request_kwargs(self, request_kwargs, data, response, **kwargs):
+    def get_iterator_next_request_kwargs(
+        self, request_kwargs, data, response, **kwargs
+    ):
         total_rows = data["total_rows"]
         limit = int(response.url.query.get("limit", self.default_per_page_limit))
         offset = int(response.url.query.get("offset", 1)) + limit
@@ -237,7 +263,10 @@ class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
                 # Fires when trying to download a non-existent part of a report.
                 return
 
-            if message_text == "Only log of requests in status 'processed' can be downloaded":
+            if (
+                message_text
+                == "Only log of requests in status 'processed' can be downloaded"
+            ):
                 raise YandexMetrikaDownloadLogError(
                     message=message, data=data, response=response, **kwargs
                 )
@@ -249,7 +278,9 @@ class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
             url_params.update(part_number=0)
         return super().fill_resource_template_url(template, url_params, **kwargs)
 
-    def get_iterator_next_request_kwargs(self, request_kwargs, data, response, **kwargs):
+    def get_iterator_next_request_kwargs(
+        self, request_kwargs, data, response, **kwargs
+    ):
         url = request_kwargs["url"]
 
         if "download" not in url:
@@ -309,6 +340,10 @@ class YandexMetrikaLogsAPIClientAdapter(YandexMetrikaClientAdapterAbstract):
                 )
 
 
-YandexMetrikaReportsAPI = generate_wrapper_from_adapter(YandexMetrikaReportsAPIClientAdapter)
-YandexMetrikaManagementAPI = generate_wrapper_from_adapter(YandexMetrikaManagementAPIClientAdapter)
+YandexMetrikaReportsAPI = generate_wrapper_from_adapter(
+    YandexMetrikaReportsAPIClientAdapter
+)
+YandexMetrikaManagementAPI = generate_wrapper_from_adapter(
+    YandexMetrikaManagementAPIClientAdapter
+)
 YandexMetrikaLogsAPI = generate_wrapper_from_adapter(YandexMetrikaLogsAPIClientAdapter)

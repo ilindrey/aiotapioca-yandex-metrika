@@ -33,7 +33,7 @@ dependencies = ["aiotapioca-wrapper>=4.0.1"]
 dynamic = ["version"]
 
 [tool.black]
-line_length = 100
+line_length = 88
 target-version = ['py37']
 
 [tool.coverage.report]
@@ -59,7 +59,7 @@ omit = [ "src/aiotapioca_yandex_metrika/__version__.py" ]
 [tool.isort]
 profile = "black"
 py_version = 37
-line_length = 100
+line_length = 88
 lines_after_imports = 2
 
 [tool.mypy]
