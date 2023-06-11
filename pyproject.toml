@@ -87,3 +87,7 @@ all = {composite = ["tests", "hints", "lint"]}
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+
+[tool.ruff]
+line-length = 88
+src = ["src"]
