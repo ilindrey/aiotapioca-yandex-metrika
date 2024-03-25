@@ -1,36 +1,36 @@
 [build-system]
-requires = ["pdm-pep517>=1.0.0"]
 build-backend = "pdm.pep517.api"
+requires = ["pdm-pep517>=1.0.0"]
 
 [project]
-name = "aiotapioca-yandex-metrika"
-description = "Python asynchronous I/O client for API Yandex Metrika"
-readme = "README.md"
 authors = [
-    {name = "Pavel Maksimov", email = "vur21@ya.ru"},
-    {name = "Andrey Ilin", email = "andreyilin@fastmail.com"},
+  {name = "Pavel Maksimov", email = "vur21@ya.ru"},
+  {name = "Andrey Ilin", email = "andreyilin@fastmail.com"}
 ]
-license = {text = "MIT"}
-keywords = ["async", "asyncio", "aiotapioca", "tapioca", "wrapper", "api", "yandex", "metrika"]
 classifiers = [
-        "Development Status :: 5 - Production/Stable",
-        "Intended Audience :: Developers",
-        "License :: OSI Approved :: MIT License",
-        "Programming Language :: Python",
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
-        "Programming Language :: Python :: 3.11",
-        "Programming Language :: Python :: 3.12",
-        "Programming Language :: Python :: Implementation :: CPython",
-        "Topic :: Internet :: WWW/HTTP",
-        "Topic :: Software Development :: Libraries :: Python Modules",
-    ]
-requires-python = ">=3.7"
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.7",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Topic :: Internet :: WWW/HTTP",
+  "Topic :: Software Development :: Libraries :: Python Modules"
+]
 dependencies = ["aiotapioca-wrapper>=4.0.1"]
+description = "Python asynchronous I/O client for API Yandex Metrika"
 dynamic = ["version"]
+keywords = ["async", "asyncio", "aiotapioca", "tapioca", "wrapper", "api", "yandex", "metrika"]
+license = {text = "MIT"}
+name = "aiotapioca-yandex-metrika"
+readme = "README.md"
+requires-python = ">=3.7"
 
 [tool.black]
 line_length = 88
@@ -38,29 +38,29 @@ target-version = ['py37']
 
 [tool.coverage.report]
 exclude_lines = [
-    "pragma: no cover",
-    # Don't complain about missing debug-only code:
-    "def __repr__",
-    "if self.debug",
-    # Don't complain if tests don't hit defensive assertion code:
-#    "raise AssertionError",
-    "raise NotImplementedError",
-    # Don't complain if non-runnable code isn't run:
-    "if __name__ == .__main__.:",
-    "if TYPE_CHECKING:",
-    ]
+  "pragma: no cover",
+  # Don't complain about missing debug-only code:
+  "def __repr__",
+  "if self.debug",
+  # Don't complain if tests don't hit defensive assertion code:
+  # "raise AssertionError",
+  "raise NotImplementedError",
+  # Don't complain if non-runnable code isn't run:
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:"
+]
 ignore_errors = true
 
 [tool.coverage.run]
 branch = true
+omit = ["src/aiotapioca_yandex_metrika/__version__.py"]
 source = ["src/aiotapioca_yandex_metrika/"]
-omit = [ "src/aiotapioca_yandex_metrika/__version__.py" ]
 
 [tool.isort]
-profile = "black"
-py_version = 37
 line_length = 88
 lines_after_imports = 2
+profile = "black"
+py_version = 37
 
 [tool.mypy]
 python_version = "3.7"
@@ -70,20 +70,20 @@ version = {source = "scm"}
 
 [tool.pdm.dev-dependencies]
 tests = [
-    "aioresponses>=0.7.3",
-    "pytest>=7.1.2",
-    "pytest-asyncio>=0.19.0",
-    "async-solipsism>=0.5,<1.0",
-    "pytest-cov>=1.7.0",
-    "setuptools>=37.0.0",
+  "aioresponses>=0.7.3",
+  "pytest>=7.1.2",
+  "pytest-asyncio>=0.19.0",
+  "async-solipsism>=0.5,<1.0",
+  "pytest-cov>=1.7.0",
+  "setuptools>=37.0.0"
 ]
 typing = ["mypy>=0.971"]
 
 [tool.pdm.scripts]
-tests = "pytest"
+all = {composite = ["tests", "hints", "lint"]}
 hints = "mypy ."
 lint = "pre-commit run --all-files"
-all = {composite = ["tests", "hints", "lint"]}
+tests = "pytest"
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
